@@ -10,9 +10,9 @@ import {
   Compass,
   Grid2X2,
   LayoutDashboard,
+  LogOut,
   Menu,
   Moon,
-  Settings2,
   Smartphone,
   Sun,
   UserRound,
@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { LanguageSelector, useI18n, type TranslationKey } from "@/lib/i18n";
+import { logout } from "@/app/auth/actions";
 
 const navigation: { label: TranslationKey; href: string; icon: LucideIcon }[] = [
   { label: "common.dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -42,7 +43,17 @@ function titleForPath(pathname: string, t: (key: TranslationKey) => string) {
   return t("common.dashboard");
 }
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({
+  children,
+  displayName,
+  email,
+  initials,
+}: {
+  children: React.ReactNode;
+  displayName: string;
+  email: string;
+  initials: string;
+}) {
   const pathname = usePathname();
   const { t } = useI18n();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -92,9 +103,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <p>{t("common.supportEmail")}</p>
         </div>
         <div className="sidebar-profile">
-          <span className="avatar avatar-profile">AM</span>
-          <span className="profile-copy"><strong>Alex Morgan</strong><small>{t("common.testerDeveloper")}</small></span>
-          <Settings2 size={17} />
+          <span className="avatar avatar-profile">{initials}</span>
+          <span className="profile-copy"><strong>{displayName}</strong><small>{email}</small></span>
+          <form action={logout}>
+            <button className="icon-button logout-button" aria-label={t("common.logout")} title={t("common.logout")} type="submit">
+              <LogOut size={16} />
+            </button>
+          </form>
         </div>
       </aside>
 
@@ -112,7 +127,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <button className="icon-button notification-button" aria-label={t("common.notifications")}>
               <Bell size={18} /><span />
             </button>
-            <button className="top-avatar" aria-label={t("common.userMenu")}>AM</button>
+            <span className="top-avatar" aria-label={displayName} title={displayName}>{initials}</span>
           </div>
         </header>
         <main className="main-content">{children}</main>

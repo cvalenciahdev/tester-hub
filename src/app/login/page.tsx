@@ -1,8 +1,25 @@
-import Link from "next/link";
-import { ArrowRight, Check, FlaskConical, UsersRound } from "lucide-react";
+import { redirect } from "next/navigation";
+import { Check, FlaskConical, UsersRound } from "lucide-react";
 import { LanguageSelector, T } from "@/lib/i18n";
+import { GoogleOAuthButton } from "@/components/auth/google-oauth-button";
+import { getCurrentUser, getOnboardingStatus } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const supabase = await createClient();
+  const user = await getCurrentUser(supabase);
+
+  if (user) {
+    const { complete } = await getOnboardingStatus(supabase, user.id);
+    redirect(complete ? "/dashboard" : "/onboarding");
+  }
+
+  const { error } = await searchParams;
+
   return (
     <main className="auth-page">
       <div className="auth-language"><LanguageSelector /></div>
@@ -12,16 +29,14 @@ export default function LoginPage() {
         <div className="eyebrow"><T id="auth.eyebrow" /></div>
         <h1><T id="auth.title" /></h1>
         <p className="auth-description"><T id="auth.description" /></p>
-        <button className="google-button"><span className="google-g">G</span><T id="auth.continueGoogle" /></button>
-        <div className="auth-divider"><span /><T id="auth.or" /><span /></div>
-        <Link className="button button-primary button-full" href="/onboarding"><T id="auth.explorePrototype" /> <ArrowRight size={16} /></Link>
+        <GoogleOAuthButton />
+        {error === "oauth_callback" && <p className="auth-error" role="alert"><T id="auth.googleError" /></p>}
         <div className="auth-benefits">
           <span><Check size={15} /> <T id="auth.benefitOne" /></span>
           <span><Check size={15} /> <T id="auth.benefitTwo" /></span>
         </div>
         <p className="auth-terms"><T id="auth.termsPrefix" /> <a href="#terms"><T id="auth.terms" /></a> <T id="auth.and" /> <a href="#privacy"><T id="auth.privacy" /></a>.</p>
       </div>
-      <div className="auth-footer"><T id="auth.haveAccount" /> <Link href="/dashboard"><T id="auth.enterDemo" /> <ArrowRight size={14} /></Link></div>
     </main>
   );
 }

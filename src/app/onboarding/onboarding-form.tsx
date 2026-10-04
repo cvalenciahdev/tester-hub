@@ -1,0 +1,181 @@
+"use client";
+
+import { useActionState, useState } from "react";
+import { ArrowRight } from "lucide-react";
+import { completeOnboarding, type OnboardingFormState } from "@/app/onboarding/actions";
+import { T, useI18n } from "@/lib/i18n";
+import type { TranslationKey } from "@/lib/i18n";
+import type { OnboardingProfile } from "@/lib/auth";
+
+type ExistingDevice = {
+  platform: "android" | "ios";
+  os_major: number;
+  os_minor: number | null;
+  model: string | null;
+};
+
+const initialState: OnboardingFormState = {};
+const intentOptions: {
+  value: "tester" | "developer" | "both";
+  label: TranslationKey;
+  description: TranslationKey;
+}[] = [
+  { value: "tester", label: "onboarding.tryApps", description: "onboarding.tryAppsDescription" },
+  { value: "developer", label: "onboarding.findTesters", description: "onboarding.findTestersDescription" },
+  { value: "both", label: "onboarding.both", description: "onboarding.bothDescription" },
+];
+
+export function OnboardingForm({
+  profile,
+  devices,
+}: {
+  profile: OnboardingProfile | null;
+  devices: ExistingDevice[];
+}) {
+  const [state, action, pending] = useActionState(completeOnboarding, initialState);
+  const { t } = useI18n();
+  const hasAndroid = devices.some((device) => device.platform === "android");
+  const hasIos = devices.some((device) => device.platform === "ios");
+  const [platform, setPlatform] = useState(
+    hasAndroid && hasIos ? "both" : hasIos ? "ios" : hasAndroid ? "android" : "",
+  );
+  const android = devices.find((device) => device.platform === "android");
+  const ios = devices.find((device) => device.platform === "ios");
+
+  return (
+    <form action={action}>
+      <div className="form-grid">
+        <label className="field">
+          <span><T id="onboarding.country" /> <b>*</b></span>
+          <input
+            autoCapitalize="characters"
+            autoComplete="country"
+            defaultValue={profile?.country_code ?? ""}
+            maxLength={2}
+            minLength={2}
+            name="country_code"
+            pattern="[A-Za-z]{2}"
+            placeholder={t("onboarding.countryPlaceholder")}
+            required
+            type="text"
+          />
+          <small><T id="onboarding.countryHelp" /></small>
+        </label>
+        <label className="field">
+          <span><T id="onboarding.testingEmail" /> <b>*</b></span>
+          <input
+            autoComplete="email"
+            defaultValue={profile?.testing_email ?? ""}
+            name="testing_email"
+            placeholder={t("onboarding.testingEmailPlaceholder")}
+            required
+            type="email"
+          />
+          <small><T id="onboarding.testingEmailHelp" /></small>
+        </label>
+      </div>
+
+      <label className="field onboarding-platform-field">
+        <span><T id="onboarding.mainPlatform" /> <b>*</b></span>
+        <select onChange={(event) => setPlatform(event.target.value)} required value={platform} name="platform">
+          <option value="" disabled><T id="onboarding.selectPlatform" /></option>
+          <option value="android">Android</option>
+          <option value="ios">iOS</option>
+          <option value="both"><T id="onboarding.both" /></option>
+        </select>
+      </label>
+
+      {(platform === "android" || platform === "both") && (
+        <DeviceFields device={android} platform="android" />
+      )}
+      {(platform === "ios" || platform === "both") && (
+        <DeviceFields device={ios} platform="ios" />
+      )}
+
+      <fieldset className="intent-options">
+        <legend><T id="onboarding.intentQuestion" /></legend>
+        {intentOptions.map(({ value, label, description }, index) => (
+          <label key={value}>
+            <input
+              defaultChecked={profile?.initial_intent ? profile.initial_intent === value : index === 0}
+              name="initial_intent"
+              required={index === 0}
+              type="radio"
+              value={value}
+            />
+            <span>
+              <strong><T id={label} /></strong>
+              <small><T id={description} /></small>
+            </span>
+          </label>
+        ))}
+      </fieldset>
+
+      {state.error && (
+        <p className="auth-error" role="alert">
+          <T id={`onboarding.error.${state.error}`} />
+        </p>
+      )}
+
+      <div className="form-actions">
+        <button className="button button-primary" disabled={pending} type="submit">
+          {pending ? t("onboarding.saving") : t("onboarding.continue")}
+          {!pending && <ArrowRight size={16} />}
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function DeviceFields({
+  device,
+  platform,
+}: {
+  device: ExistingDevice | undefined;
+  platform: "android" | "ios";
+}) {
+  const { t } = useI18n();
+  const idPrefix = `onboarding-${platform}`;
+
+  return (
+    <fieldset className="device-fields">
+      <legend>{platform === "android" ? "Android" : "iOS"}</legend>
+      <div className="form-grid">
+        <label className="field">
+          <span><T id="onboarding.systemMajor" /> <b>*</b></span>
+          <input
+            defaultValue={device?.os_major ?? ""}
+            id={`${idPrefix}-major`}
+            min="0"
+            max="32767"
+            name={`${platform}_os_major`}
+            required
+            step="1"
+            type="number"
+          />
+        </label>
+        <label className="field">
+          <span><T id="onboarding.systemMinor" /> <small><T id="onboarding.optional" /></small></span>
+          <input
+            defaultValue={device?.os_minor ?? ""}
+            id={`${idPrefix}-minor`}
+            min="0"
+            max="32767"
+            name={`${platform}_os_minor`}
+            step="1"
+            type="number"
+          />
+        </label>
+        <label className="field field-full">
+          <span><T id="onboarding.deviceModel" /> <small><T id="onboarding.optional" /></small></span>
+          <input
+            defaultValue={device?.model ?? ""}
+            id={`${idPrefix}-model`}
+            name={`${platform}_model`}
+            placeholder={t("onboarding.devicePlaceholder")}
+          />
+        </label>
+      </div>
+    </fieldset>
+  );
+}
