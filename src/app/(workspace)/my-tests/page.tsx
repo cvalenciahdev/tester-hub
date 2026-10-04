@@ -1,38 +1,50 @@
 import Link from "next/link";
-import { Check, CircleHelp, ExternalLink, MoreHorizontal } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-import { campaigns, participations } from "@/lib/mock-data";
-import type { ParticipationStatus } from "@/lib/mock-data";
-import { Badge, PageHeading } from "@/components/ui";
-import { T, TranslatedIconButton, type TranslationKey } from "@/lib/i18n";
+import { EmptyHint, PageHeading } from "@/components/ui";
+import { T, type TranslationKey } from "@/lib/i18n";
+import { filterMyParticipations, getMyTestsData, parseMyTestsFilter, type ParticipationStatus } from "@/lib/my-tests";
+import { ParticipationActions } from "./participation-actions";
+import { MyTestsEndDate, MyTestsFilterControl } from "./my-tests-controls";
 
-const actionForStatus: Record<ParticipationStatus, { label: TranslationKey; icon: LucideIcon; href: string }> = {
-  "Waiting access": { label: "common.viewDetails", icon: CircleHelp, href: "/explore/pocket-garden" },
-  "Access enabled": { label: "tests.confirmInstall", icon: Check, href: "/explore/luma-learn" },
-  Active: { label: "tests.completeTest", icon: Check, href: "/explore/trail-notes" },
-  Completed: { label: "tests.viewTest", icon: ExternalLink, href: "/explore/finch-wallet" },
-  Incompatible: { label: "common.viewDetails", icon: CircleHelp, href: "/explore/pocket-garden" },
-  Abandoned: { label: "common.viewDetails", icon: ExternalLink, href: "/explore/trail-notes" },
-  Cancelled: { label: "common.viewDetails", icon: ExternalLink, href: "/explore/luma-learn" },
+const statuses: Record<ParticipationStatus, { key: TranslationKey; style: string }> = {
+  waiting_access: { key: "status.Waiting access", style: "badge-amber" },
+  access_enabled: { key: "status.Access enabled", style: "badge-blue" },
+  active: { key: "status.Active", style: "badge-green" },
+  completed: { key: "status.Completed", style: "badge-green" },
+  incompatible: { key: "status.Incompatible", style: "badge-red" },
+  abandoned: { key: "status.Abandoned", style: "badge-neutral" },
+  cancelled: { key: "status.Cancelled", style: "badge-red" },
 };
-
-export default function MyTestsPage() {
+export default async function MyTestsPage({ searchParams }: PageProps<"/my-tests">) {
+  const filter = parseMyTestsFilter((await searchParams).status);
+  const data = await getMyTestsData();
+  const participations = filterMyParticipations(data.participations, filter);
   return (
     <>
       <PageHeading eyebrow={<T id="tests.eyebrow" />} title={<T id="tests.title" />} description={<T id="tests.description" />} />
-      <div className="test-summary-strip"><div><span className="summary-dot dot-blue" /><strong>3</strong><span><T id="tests.inProgress" /></span></div><div><span className="summary-dot dot-amber" /><strong>1</strong><span><T id="dashboard.waitingAccess" /></span></div><div><span className="summary-dot dot-green" /><strong>1</strong><span><T id="tests.completed" /></span></div></div>
+      <div className="test-summary-strip">
+        <div><span className="summary-dot dot-blue" /><strong>{data.metrics.in_progress}</strong><span><T id="tests.inProgress" /></span></div>
+        <div><span className="summary-dot dot-amber" /><strong>{data.metrics.waiting_access}</strong><span><T id="dashboard.waitingAccess" /></span></div>
+        <div><span className="summary-dot dot-green" /><strong>{data.metrics.completed}</strong><span><T id="tests.completed" /></span></div>
+      </div>
       <section className="panel table-panel">
-        <div className="table-toolbar"><div><h2><T id="tests.allParticipations" /></h2><p><T id="tests.pastAndCurrent" /></p></div><label className="sr-only" htmlFor="participation-status-filter"><T id="tests.filterStatus" /></label><select id="participation-status-filter" defaultValue="all"><option value="all"><T id="tests.allStatuses" /></option><option value="progress"><T id="tests.inProgress" /></option><option value="waiting"><T id="dashboard.waitingAccess" /></option><option value="completed"><T id="tests.completed" /></option></select></div>
-        <div className="table-scroll"><table><thead><tr><th><T id="campaigns.name" /></th><th><T id="campaigns.status" /></th><th><T id="tests.ending" /></th><th><T id="tests.action" /></th><th /></tr></thead><tbody>
-          {participations.map((participation, index) => {
-            const campaign = campaigns.find((item) => item.id === participation.campaignId)!;
-            const action = actionForStatus[participation.status];
-            const ActionIcon = action.icon;
-            return <tr key={`${participation.campaignId}-${participation.status}`}><td><div className="table-app"><span className={`app-mark app-mark-small mark-${campaign.color}`}>{campaign.icon}</span><span><strong>{campaign.name}</strong><small>{campaign.app} · {campaign.platform}</small></span></div></td><td><Badge status={participation.status} /></td><td className="muted-cell">{participation.endDate}</td><td><div className="participation-actions"><Link className={`row-action ${index < 3 ? "row-action-strong" : ""}`} href={action.href}><ActionIcon size={14} /><T id={action.label} /></Link>{participation.status === "Access enabled" && <button className="row-action" type="button"><T id="tests.markIncompatible" /></button>}{participation.status === "Active" && <button className="row-action" type="button"><T id="tests.abandon" /></button>}</div></td><td><TranslatedIconButton label="tests.moreOptionsFor" values={{ name: campaign.name }} className="dots-button"><MoreHorizontal size={18} /></TranslatedIconButton></td></tr>;
-          })}
-        </tbody></table></div>
+        <div className="table-toolbar"><div><h2><T id="tests.allParticipations" /></h2><p><T id="tests.pastAndCurrent" /></p></div><MyTestsFilterControl filter={filter} /></div>
+        {participations.length === 0 ? <EmptyHint>
+          <T id={data.participations.length === 0 ? "tests.empty" : "tests.emptyFiltered"} />{" "}
+          <Link className="text-link" href={data.participations.length === 0 ? "/explore" : "/my-tests"}><T id={data.participations.length === 0 ? "tests.explore" : "tests.backToAll"} /></Link>
+        </EmptyHint> : <div className="table-scroll"><table>
+          <thead><tr><th><T id="campaigns.name" /></th><th><T id="campaigns.status" /></th><th><T id="tests.ending" /></th><th><T id="tests.action" /></th><th /></tr></thead>
+          <tbody>{participations.map((row) => {
+            const status = statuses[row.participation_status];
+            const initials = row.app_name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
+            return <tr key={row.participation_id}>
+              <td><div className="table-app"><span className={`app-mark app-mark-small mark-${row.platform === "ios" ? "lavender" : "mint"}`}>{initials}</span><span><strong>{row.app_name}</strong><small><T id={row.platform === "android" ? "explore.android" : "explore.ios"} /></small></span></div></td>
+              <td><span className={`badge ${status.style}`}><T id={status.key} /></span></td>
+              <td className="muted-cell"><MyTestsEndDate value={row.expected_end_at} /></td>
+              <td><ParticipationActions participation={{ participation_id: row.participation_id, participation_status: row.participation_status, can_complete: row.can_complete }} /></td><td />
+            </tr>;
+          })}</tbody>
+        </table></div>}
       </section>
-      <div className="demo-note"><T id="tests.demoActions" /></div>
     </>
   );
 }
