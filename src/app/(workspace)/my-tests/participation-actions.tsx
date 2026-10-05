@@ -10,9 +10,10 @@ const errorKeys: Record<NonNullable<MutationResult["error"]>, TranslationKey> = 
   INVALID_PARTICIPATION_STATE: "tests.errorState", TEST_PERIOD_NOT_FINISHED: "tests.errorPeriod",
   REASON_REQUIRED: "tests.errorReason", NOT_AUTHENTICATED: "tests.errorAuth",
   NOT_PARTICIPATION_TESTER: "tests.errorOwnership", ACTION_FAILED: "tests.errorAction",
+  FEEDBACK_REQUIRED: "feedback.beforeComplete",
 };
 
-export function ParticipationActions({ participation }: { participation: Pick<MyParticipation, "participation_id" | "participation_status" | "can_complete"> }) {
+export function ParticipationActions({ participation }: { participation: Pick<MyParticipation, "participation_id" | "participation_status" | "can_complete"> & { hasFeedback: boolean } }) {
   const [editor, setEditor] = useState<"incompatible" | "abandon" | null>(null);
   const [reason, setReason] = useState("");
   const [result, setResult] = useState<MutationResult>({});
@@ -44,11 +45,12 @@ export function ParticipationActions({ participation }: { participation: Pick<My
     <div aria-busy={pending}>
       <div className="participation-actions" style={{ flexWrap: "wrap" }}>
         {status === "access_enabled" && <button className="row-action row-action-strong" type="button" disabled={pending} onClick={() => run(() => confirmInstallation(participation.participation_id))}><Check size={14} /><T id="tests.confirmInstall" /></button>}
-        {status === "active" && <button className={`row-action ${participation.can_complete ? "row-action-strong" : ""}`} type="button" disabled={pending || !participation.can_complete} onClick={() => { if (participation.can_complete) run(() => completeParticipation(participation.participation_id)); }}><Check size={14} /><T id="tests.completeTest" /></button>}
+        {status === "active" && <button className={`row-action ${participation.can_complete && participation.hasFeedback ? "row-action-strong" : ""}`} type="button" disabled={pending || !participation.can_complete || !participation.hasFeedback} onClick={() => { if (participation.can_complete && participation.hasFeedback) run(() => completeParticipation(participation.participation_id)); }}><Check size={14} /><T id="tests.completeTest" /></button>}
         <button className="row-action" type="button" disabled={pending} onClick={() => openEditor("incompatible")}><T id="tests.markIncompatible" /></button>
         <button className="row-action" type="button" disabled={pending} onClick={() => openEditor("abandon")}><T id="tests.abandon" /></button>
       </div>
       {status === "active" && !participation.can_complete && <p className="muted-cell"><T id="tests.periodPending" /></p>}
+      {status === "active" && !participation.hasFeedback && <p className="muted-cell"><T id="feedback.beforeComplete" /></p>}
       {editor && <form onSubmit={(event) => {
         event.preventDefault();
         const trimmed = reason.trim();

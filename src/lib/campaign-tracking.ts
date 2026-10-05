@@ -3,6 +3,7 @@ import { isAppId } from "@/lib/apps";
 import type { RoundStatus } from "@/lib/app-rounds";
 import type { ParticipationStatus } from "@/lib/my-tests";
 import { createClient } from "@/lib/supabase/server";
+import { readFeedbacks, type ParticipationFeedback } from "@/lib/participation-feedback";
 
 export const trackingStatuses = ["waiting_access", "access_enabled", "active", "completed", "incompatible", "abandoned", "cancelled"] as const;
 export type TrackedParticipation = {
@@ -10,6 +11,7 @@ export type TrackedParticipation = {
   testing_email_snapshot: string; participation_status: ParticipationStatus; joined_at: string;
   access_enabled_at: string | null; installed_at: string | null; expected_end_at: string | null;
   closed_at: string | null; close_reason: string | null;
+  feedbacks: ParticipationFeedback[];
 };
 export type TrackingCampaign = {
   campaign_id: string; app_id: string; app_name: string; platform: "android" | "ios"; campaign_status: RoundStatus;
@@ -26,7 +28,7 @@ function participation(value: unknown): value is TrackedParticipation {
     (value.country_code === null || (typeof value.country_code === "string" && /^[A-Z]{2}$/.test(value.country_code))) &&
     typeof value.testing_email_snapshot === "string" && typeof value.participation_status === "string" && trackingStatuses.some((s) => s === value.participation_status) &&
     date(value.joined_at) && nullableDate(value.access_enabled_at) && nullableDate(value.installed_at) &&
-    nullableDate(value.expected_end_at) && nullableDate(value.closed_at) && text(value.close_reason);
+    nullableDate(value.expected_end_at) && nullableDate(value.closed_at) && text(value.close_reason) && readFeedbacks(value.feedbacks) !== null;
 }
 export async function getCampaignTracking(id: string): Promise<CampaignTracking | null> {
   if (!isAppId(id)) return null;
@@ -57,6 +59,6 @@ export async function getCampaignTracking(id: string): Promise<CampaignTracking 
     participations: rows.map((p) => ({ participation_id: p.participation_id, tester_id: p.tester_id,
       display_name: p.display_name, country_code: p.country_code, testing_email_snapshot: p.testing_email_snapshot,
       participation_status: p.participation_status, joined_at: p.joined_at, access_enabled_at: p.access_enabled_at,
-      installed_at: p.installed_at, expected_end_at: p.expected_end_at, closed_at: p.closed_at, close_reason: p.close_reason })),
+      installed_at: p.installed_at, expected_end_at: p.expected_end_at, closed_at: p.closed_at, close_reason: p.close_reason, feedbacks: readFeedbacks(p.feedbacks)! })),
   };
 }

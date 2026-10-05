@@ -32,10 +32,9 @@ export default async function AppsPage({ searchParams }: PageProps<"/apps">) {
             {app.platforms.length > 0 && <span><Smartphone size={15} /><T id={app.platforms.length === 2 ? "campaignForm.androidIos" : app.platforms[0] === "android" ? "explore.android" : "explore.ios"} /></span>}
             <span><Users size={15} /><T id="apps.campaignCount" values={{ count: app.round_count }} /></span>
           </div>
-          <div className="app-card-actions"><Link className="button button-secondary button-small" href={`/apps/${app.id}`}><T id="apps.viewApp" /><ArrowRight size={14} /></Link></div>
+          <div className="app-card-actions"><Link className="button button-secondary button-small" href={`/apps/${app.id}`}><T id="apps.viewApp" /><ArrowRight size={14} /></Link><Link className="button button-secondary button-small" href={`/apps/${app.id}/campaigns`}><T id="apps.viewCampaigns" /><ArrowRight size={14} /></Link></div>
         </article>;
       })}</div>}
-      <div className="app-tip"><span><strong><T id="apps.notListed" /></strong> <T id="apps.createAppPrompt" /></span><Link className="text-link" href="/apps/new"><T id="apps.createApp" /><ArrowRight size={14} /></Link></div>
     </>
   );
 }

@@ -52,13 +52,12 @@ export function CampaignForm({ appId, campaign }: { appId: string; campaign?: Ow
         <section className="form-section">
           <div className="form-section-heading"><span className="section-number">03</span><div><h2><T id="campaignForm.accessInstructions" /></h2></div></div>
           <div className="form-grid">
-            <label className="field field-full"><span><T id="campaignForm.optInUrl" /></span><input name="opt_in_url" defaultValue={campaign?.opt_in_url ?? ""} disabled={disabled} /></label>
             <label className="field field-full"><span><T id="campaignForm.storeUrl" /></span><input name="store_url" defaultValue={campaign?.store_url ?? ""} disabled={disabled} /></label>
             <label className="field field-full"><span><T id="campaignForm.instructions" /></span><textarea name="instructions" rows={5} defaultValue={campaign?.instructions ?? ""} disabled={disabled} /></label>
           </div>
         </section>
         <div className="form-actions">
-          <Link className="button button-quiet" href={`/apps/${appId}`}><T id="roundForm.back" /></Link>
+          <Link className="button button-quiet" href={`/apps/${appId}/campaigns`}><T id="apps.backToCampaigns" /></Link>
           {!readOnly && <button className="button button-primary" name="operation" value="save" type="submit" disabled={pending}><T id={campaign ? "apps.saveChanges" : "campaignForm.saveDraft"} /></button>}
         </div>
       </form>

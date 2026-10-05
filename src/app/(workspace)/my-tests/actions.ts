@@ -5,7 +5,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 export type MutationResult = {
-  error?: "INVALID_PARTICIPATION_STATE" | "TEST_PERIOD_NOT_FINISHED" | "REASON_REQUIRED" | "NOT_AUTHENTICATED" | "NOT_PARTICIPATION_TESTER" | "ACTION_FAILED";
+  error?: "INVALID_PARTICIPATION_STATE" | "TEST_PERIOD_NOT_FINISHED" | "FEEDBACK_REQUIRED" | "REASON_REQUIRED" | "NOT_AUTHENTICATED" | "NOT_PARTICIPATION_TESTER" | "ACTION_FAILED";
 };
 type Operation = "confirm_installation" | "complete_participation" | "mark_incompatible" | "abandon_participation";
 
@@ -27,7 +27,7 @@ async function mutate(operation: Operation, participationId: string, reason?: st
     if (error) {
       const code = error.message;
       if (code === "INVALID_PARTICIPATION_STATE" || code === "TEST_PERIOD_NOT_FINISHED" ||
-          code === "REASON_REQUIRED" || code === "NOT_AUTHENTICATED" || code === "NOT_PARTICIPATION_TESTER") {
+          code === "FEEDBACK_REQUIRED" || code === "REASON_REQUIRED" || code === "NOT_AUTHENTICATED" || code === "NOT_PARTICIPATION_TESTER") {
         return { error: code };
       }
       return { error: "ACTION_FAILED" };

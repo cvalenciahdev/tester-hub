@@ -8,6 +8,7 @@ import type { ParticipationStatus } from "@/lib/my-tests";
 import type { RoundStatus } from "@/lib/app-rounds";
 import { ParticipantActions } from "./participant-actions";
 import { TrackingDate } from "./tracking-date";
+import { ParticipationFeedbackList } from "@/components/participation-feedback-list";
 
 const campaignBadges = { draft: "Draft", recruiting: "Recruiting", testing: "Testing", completed: "Completed", cancelled: "Cancelled" } as const satisfies Record<RoundStatus, string>;
 const participationBadges = { waiting_access: "Waiting access", access_enabled: "Access enabled", active: "Active", completed: "Completed", incompatible: "Incompatible", abandoned: "Abandoned", cancelled: "Cancelled" } as const satisfies Record<ParticipationStatus, string>;
@@ -45,7 +46,7 @@ export default async function TrackingPage({ params }: PageProps<"/campaigns/[id
               <dt><T id="tracking.endDate" /></dt><dd><TrackingDate value={row.expected_end_at} /></dd>
               <dt><T id="tracking.closeDate" /></dt><dd><TrackingDate value={row.closed_at} /></dd>
               {row.close_reason !== null && <><dt><T id="tracking.closeReason" /></dt><dd>{row.close_reason}</dd></>}
-            </dl></details></td>
+            </dl></details><details><summary><T id="feedback.title" /> ({row.feedbacks.length})</summary><ParticipationFeedbackList feedbacks={row.feedbacks} /></details></td>
             <td><ParticipantActions campaignId={campaign.campaign_id} participationId={row.participation_id} status={row.participation_status} /></td>
           </tr>;
         })}</tbody>

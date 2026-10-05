@@ -11,7 +11,7 @@ export default async function NewRoundPage({ params }: PageProps<"/apps/[id]/cam
   const app = await getOwnApp(id);
   if (!app) notFound();
   return <>
-    <Link className="back-link" href={`/apps/${app.id}`}><ArrowLeft size={16} /><T id="roundForm.back" /></Link>
+    <Link className="back-link" href={`/apps/${app.id}/campaigns`}><ArrowLeft size={16} /><T id="apps.backToCampaigns" /></Link>
     <PageHeading eyebrow={<T id="roundForm.new" />} title={app.name} description={app.description ?? ""} />
     {app.archived_at !== null ? <section className="panel"><EmptyHint><T id="roundForm.errorArchived" /></EmptyHint></section> : <CampaignForm appId={app.id} />}
   </>;

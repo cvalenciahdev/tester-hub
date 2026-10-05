@@ -4,6 +4,7 @@ import { T, type TranslationKey } from "@/lib/i18n";
 import { filterMyParticipations, getMyTestsData, parseMyTestsFilter, type ParticipationStatus } from "@/lib/my-tests";
 import { ParticipationActions } from "./participation-actions";
 import { MyTestsEndDate, MyTestsFilterControl } from "./my-tests-controls";
+import { ParticipationFeedbackSection } from "./participation-feedback";
 
 const statuses: Record<ParticipationStatus, { key: TranslationKey; style: string }> = {
   waiting_access: { key: "status.Waiting access", style: "badge-amber" },
@@ -40,7 +41,7 @@ export default async function MyTestsPage({ searchParams }: PageProps<"/my-tests
               <td><div className="table-app"><span className={`app-mark app-mark-small mark-${row.platform === "ios" ? "lavender" : "mint"}`}>{initials}</span><span><strong>{row.app_name}</strong><small><T id={row.platform === "android" ? "explore.android" : "explore.ios"} /></small></span></div></td>
               <td><span className={`badge ${status.style}`}><T id={status.key} /></span></td>
               <td className="muted-cell"><MyTestsEndDate value={row.expected_end_at} /></td>
-              <td><ParticipationActions participation={{ participation_id: row.participation_id, participation_status: row.participation_status, can_complete: row.can_complete }} /></td><td />
+              <td>{(row.participation_status === "access_enabled" || row.participation_status === "active") && row.store_url && <a className="row-action row-action-strong" href={row.store_url} target="_blank" rel="noopener noreferrer"><T id="tests.openInstallation" /></a>}<ParticipationActions participation={{ participation_id: row.participation_id, participation_status: row.participation_status, can_complete: row.can_complete, hasFeedback: row.feedbacks.length > 0 }} /><ParticipationFeedbackSection participationId={row.participation_id} status={row.participation_status} feedbacks={row.feedbacks} /></td><td />
             </tr>;
           })}</tbody>
         </table></div>}

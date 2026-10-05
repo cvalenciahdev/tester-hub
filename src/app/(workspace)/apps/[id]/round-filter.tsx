@@ -12,7 +12,7 @@ export function RoundFilterControl({ appId, filter }: { appId: string; filter: R
     <label className="sr-only" htmlFor="app-round-status-filter"><T id="campaigns.filter" /></label>
     <select id="app-round-status-filter" value={filter} disabled={pending} aria-busy={pending} onChange={(event) => {
       const status = event.target.value;
-      startTransition(() => router.push(`/apps/${appId}${status === "all" ? "" : `?round_status=${encodeURIComponent(status)}`}`, { scroll: false }));
+      startTransition(() => router.push(`/apps/${appId}/campaigns${status === "all" ? "" : `?round_status=${encodeURIComponent(status)}`}`, { scroll: false }));
     }}>
       <option value="all"><T id="campaigns.allStatuses" /></option>
       <option value="draft"><T id="status.Draft" /></option>

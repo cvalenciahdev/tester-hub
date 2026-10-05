@@ -21,7 +21,6 @@ export function campaignInput(form: FormData, structural: boolean) {
   if (target === undefined) return { error: "target" as const };
   const fields = {
     p_target_testers: target as number,
-    p_opt_in_url: typeof form.get("opt_in_url") === "string" ? (form.get("opt_in_url") as string).trim() : null,
     p_store_url: typeof form.get("store_url") === "string" ? (form.get("store_url") as string).trim() : null,
     p_instructions: typeof form.get("instructions") === "string" ? (form.get("instructions") as string).trim() : null,
   };
