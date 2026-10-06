@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { PendingButtonContent } from "@/components/loading-state";
 import { ArrowRight } from "lucide-react";
 import { T, type TranslationKey } from "@/lib/i18n";
 import type { ExploreCampaignDetail, OwnParticipationStatus } from "@/lib/explore";
@@ -35,7 +36,7 @@ export function JoinCampaignButton({ campaignId, availableSlots, participation }
           try { setResult(await joinExploreCampaign(campaignId)); }
           catch { setResult({ error: "JOIN_FAILED" }); }
         })}>
-        <T id={label} />{!participation && availableSlots > 0 && <ArrowRight size={16} />}
+        <PendingButtonContent pending={pending} label="detail.joining"><T id={label} />{!participation && availableSlots > 0 && <ArrowRight size={16} />}</PendingButtonContent>
       </button>
       {result.error && <p className="join-footnote" role="alert"><T id={joinErrors[result.error]} /></p>}
     </>

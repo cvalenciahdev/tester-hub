@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { InlineLoading, PendingButtonContent } from "@/components/loading-state";
 import { useActionState, useRef, useState } from "react";
 import { T, type TranslationKey } from "@/lib/i18n";
 import type { OwnCampaign } from "@/lib/own-campaigns";
@@ -58,12 +59,12 @@ export function CampaignForm({ appId, campaign }: { appId: string; campaign?: Ow
         </section>
         <div className="form-actions">
           <Link className="button button-quiet" href={`/apps/${appId}/campaigns`}><T id="apps.backToCampaigns" /></Link>
-          {!readOnly && <button className="button button-primary" name="operation" value="save" type="submit" disabled={pending}><T id={campaign ? "apps.saveChanges" : "campaignForm.saveDraft"} /></button>}
+          {!readOnly && <button className="button button-primary" name="operation" value="save" type="submit" disabled={pending}><PendingButtonContent pending={pending} label="apps.saving" announce={false}><T id={campaign ? "apps.saveChanges" : "campaignForm.saveDraft"} /></PendingButtonContent></button>}
         </div>
       </form>
       {state.error && <p role="alert"><T id={errors[state.error]} /></p>}
       {state.saved && <p role="status"><T id="roundForm.saved" /></p>}
-      {pending && <p role="status"><T id="apps.saving" /></p>}
+      {pending && <InlineLoading label="loading.processing" />}
     </div>
     <aside className="panel form-aside">
       <h3><T id="roundForm.lifecycle" /></h3>
@@ -71,14 +72,14 @@ export function CampaignForm({ appId, campaign }: { appId: string; campaign?: Ow
       {!campaign && <p><T id="roundForm.draftHelp" /></p>}
       {campaign?.status === "draft" && !campaign.archived && <form action={action} onSubmit={submit} aria-busy={pending}>
         <p><T id="roundForm.publishHelp" /></p>
-        <button className="button button-primary" name="operation" value="publish" disabled={pending}><T id="campaignForm.publish" /></button>
+        <button className="button button-primary" name="operation" value="publish" disabled={pending}><PendingButtonContent pending={pending} label="loading.processing" announce={false}><T id="campaignForm.publish" /></PendingButtonContent></button>
       </form>}
       {campaign && !terminal && <details>
         <summary><T id="roundForm.cancel" /></summary>
         <form action={action} onSubmit={submit} aria-busy={pending}>
           <label className="field"><span><T id="roundForm.reason" /></span><textarea name="reason" rows={3} disabled={pending} /></label>
           <p><T id="roundForm.cancelHelp" /></p>
-          <button className="button button-secondary" name="operation" value="cancel" disabled={pending}><T id="roundForm.cancel" /></button>
+          <button className="button button-secondary" name="operation" value="cancel" disabled={pending}><PendingButtonContent pending={pending} label="loading.processing" announce={false}><T id="roundForm.cancel" /></PendingButtonContent></button>
         </form>
       </details>}
     </aside>

@@ -1,0 +1,63 @@
+.spinner {
+  display: inline-block;
+  flex-shrink: 0;
+  border: 2px solid var(--blue-soft);
+  border-top-color: var(--blue);
+  border-right-color: var(--blue);
+  border-radius: 50%;
+  animation: spin 850ms linear infinite;
+}
+
+.small { width: 16px; height: 16px; }
+.medium { width: 28px; height: 28px; }
+.inherit { border-color: currentColor; border-bottom-color: transparent; border-left-color: transparent; }
+
+.page {
+  display: grid;
+  place-items: center;
+  min-height: max(240px, calc(100dvh - 180px));
+  padding: 20px 0;
+}
+
+.card {
+  width: min(100%, 330px);
+  padding: 28px 24px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.title {
+  margin: 14px 0 0;
+  color: var(--text-strong);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.subtitle {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.section {
+  display: grid;
+  place-items: center;
+  min-height: 160px;
+  padding: 24px 12px;
+  text-align: center;
+}
+
+.sectionContent { max-width: 100%; }
+.section .title { font-size: 12px; font-weight: 400; }
+.inline { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: 11px; line-height: 1.5; }
+.buttonContent { display: inline-grid; align-items: center; }
+.buttonContent > span { grid-area: 1 / 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.hidden { visibility: hidden; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }

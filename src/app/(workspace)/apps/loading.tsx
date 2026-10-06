@@ -1,4 +1,5 @@
-import { T } from "@/lib/i18n";
-export default function AppsLoading() {
-  return <div className="panel" aria-busy="true" role="status"><T id="apps.loading" /></div>;
+import { LoadingState } from "@/components/loading-state";
+
+export default function Loading() {
+  return <LoadingState label="apps.loading" />;
 }

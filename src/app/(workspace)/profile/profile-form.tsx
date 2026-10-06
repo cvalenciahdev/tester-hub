@@ -1,5 +1,6 @@
 "use client";
 import { useActionState, useRef, useState } from "react";
+import { PendingButtonContent } from "@/components/loading-state";
 import { LockKeyhole, Mail, Smartphone } from "lucide-react";
 import { CurrentLanguageName, T, type TranslationKey, useI18n } from "@/lib/i18n";
 import type { ProfileData } from "@/lib/profile";
@@ -48,7 +49,7 @@ export function ProfileForm({ data }: { data: ProfileData }) {
       <div className="profile-layout">
         <div className="profile-main">
           <section className="panel profile-card">
-            <div className="profile-section-head"><div><h2><T id="profile.personalInfo" /></h2><p><T id="profile.personalDescription" /></p></div><button className="button button-primary" form="profile-form" type="submit" disabled={pending}><T id="profile.save" /></button></div>
+            <div className="profile-section-head"><div><h2><T id="profile.personalInfo" /></h2><p><T id="profile.personalDescription" /></p></div><button className="button button-primary" form="profile-form" type="submit" disabled={pending}><PendingButtonContent pending={pending} label="apps.saving"><T id="profile.save" /></PendingButtonContent></button></div>
             <div className="profile-identity"><span className="profile-big-avatar">{initials || "—"}</span><div><strong>{name.trim() || "—"}</strong><span><T id="profile.created" /> <time dateTime={data.profile.created_at}>{new Intl.DateTimeFormat(language === "es" ? "es-MX" : "en-US", { dateStyle: "medium", timeZone: "America/Cancun" }).format(new Date(data.profile.created_at))}</time></span></div></div>
             <div className="profile-fields">
               <label className="field"><span><T id="profile.name" /></span><input name="display_name" value={name} onChange={(event) => setName(event.target.value)} disabled={pending} /></label>
@@ -73,7 +74,6 @@ export function ProfileForm({ data }: { data: ProfileData }) {
           {data.anomalous && <p role="status"><T id="profile.anomalous" /></p>}
           {state.error && <p role="alert"><T id={errors[state.error]} /></p>}
           {state.saved && <p role="status"><T id="profile.saved" /></p>}
-          {pending && <p role="status"><T id="onboarding.saving" /></p>}
         </div>
         <aside className="profile-side"><section className="panel security-card"><span className="security-icon"><LockKeyhole size={18} /></span><h3><T id="profile.privacyTitle" /></h3><p><T id="profile.privacyDescription" /></p></section></aside>
       </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, useTransition } from "react";
+import { InlineLoading } from "@/components/loading-state";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { ExploreQuery } from "@/lib/explore";
@@ -46,7 +47,7 @@ export function ExploreControls({ query, totalCount }: { query: ExploreQuery; to
   const visiblePages = [...new Set([1, query.page - 1, query.page, query.page + 1, pages])].filter((page) => page >= 1 && page <= pages).sort((a, b) => a - b);
   return (
     <div className="pagination" aria-busy={pending}>
-      <span className="page-count"><T id="explore.pageRange" values={{ start: totalCount === 0 ? 0 : (query.page - 1) * query.limit + 1, end: Math.min(query.page * query.limit, totalCount), total: totalCount }} /></span>
+      <span className="page-count">{pending ? <InlineLoading label="loading.moreResults" /> : <T id="explore.pageRange" values={{ start: totalCount === 0 ? 0 : (query.page - 1) * query.limit + 1, end: Math.min(query.page * query.limit, totalCount), total: totalCount }} />}</span>
       <nav className="pagination-controls" aria-label={t("explore.pagination")}>
         <button className="page-button" type="button" aria-label={t("explore.previousPage")} disabled={pending || query.page === 1} onClick={() => navigate({ ...query, page: query.page - 1 })}><ChevronLeft size={15} /></button>
         {visiblePages.map((page, index) => (

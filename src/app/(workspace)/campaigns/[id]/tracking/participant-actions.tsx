@@ -1,5 +1,6 @@
 "use client";
 import { useRef, useState, useTransition } from "react";
+import { InlineLoading, PendingButtonContent } from "@/components/loading-state";
 import { T, type TranslationKey } from "@/lib/i18n";
 import type { ParticipationStatus } from "@/lib/my-tests";
 import { enableTrackedAccess, cancelTrackedParticipation, type TrackingMutation } from "./actions";
@@ -30,17 +31,17 @@ export function ParticipantActions({ campaignId, participationId, status }: { ca
   if (!open) return <span className="muted-cell"><T id="tests.readOnly" /></span>;
   return <div aria-busy={pending}>
     <div className="participant-actions">
-      {status === "waiting_access" && <button className="row-action row-action-strong" type="button" disabled={pending} onClick={() => run(() => enableTrackedAccess(campaignId, participationId))}><T id="tracking.enableAccess" /></button>}
+      {status === "waiting_access" && <button className="row-action row-action-strong" type="button" disabled={pending} onClick={() => run(() => enableTrackedAccess(campaignId, participationId))}><PendingButtonContent pending={pending} label="loading.processing" announce={false}><T id="tracking.enableAccess" /></PendingButtonContent></button>}
       <button className="row-action row-action-muted" type="button" disabled={pending} onClick={() => { if (!inFlight.current && !pending) { setEditor(true); setResult({}); } }}><T id="tracking.cancelParticipation" /></button>
     </div>
     {editor && <form onSubmit={(event) => { event.preventDefault(); run(() => cancelTrackedParticipation(campaignId, participationId, reason)); }}>
       <label className="field"><span><T id="roundForm.reason" /></span><textarea rows={2} value={reason} onChange={(event) => setReason(event.target.value)} disabled={pending} /></label>
       <div className="participant-actions">
-        <button className="row-action row-action-strong" type="submit" disabled={pending}><T id="tracking.cancelParticipation" /></button>
+        <button className="row-action row-action-strong" type="submit" disabled={pending}><PendingButtonContent pending={pending} label="loading.processing" announce={false}><T id="tracking.cancelParticipation" /></PendingButtonContent></button>
         <button className="row-action" type="button" disabled={pending} onClick={() => { if (!inFlight.current) { setEditor(false); setReason(""); } }}><T id="common.cancel" /></button>
       </div>
     </form>}
-    {pending && <p className="muted-cell" role="status"><T id="apps.saving" /></p>}
+    {pending && <InlineLoading label="loading.processing" />}
     {result.error && <p className="muted-cell" role="alert"><T id={errorKeys[result.error]} /></p>}
   </div>;
 }

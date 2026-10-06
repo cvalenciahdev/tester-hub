@@ -1,9 +1,5 @@
-import { T } from "@/lib/i18n";
+import { LoadingState } from "@/components/loading-state";
 
-export default function DashboardLoading() {
-  return (
-    <div className="panel" aria-busy="true" role="status">
-      <T id="dashboard.loading" />
-    </div>
-  );
+export default function Loading() {
+  return <LoadingState label="dashboard.loading" />;
 }

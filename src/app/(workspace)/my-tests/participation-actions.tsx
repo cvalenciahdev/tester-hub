@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
+import { InlineLoading, PendingButtonContent } from "@/components/loading-state";
 import { Check } from "lucide-react";
 import { T, type TranslationKey } from "@/lib/i18n";
 import type { MyParticipation } from "@/lib/my-tests";
@@ -44,8 +45,8 @@ export function ParticipationActions({ participation }: { participation: Pick<My
   return (
     <div aria-busy={pending}>
       <div className="participation-actions" style={{ flexWrap: "wrap" }}>
-        {status === "access_enabled" && <button className="row-action row-action-strong" type="button" disabled={pending} onClick={() => run(() => confirmInstallation(participation.participation_id))}><Check size={14} /><T id="tests.confirmInstall" /></button>}
-        {status === "active" && <button className={`row-action ${participation.can_complete && participation.hasFeedback ? "row-action-strong" : ""}`} type="button" disabled={pending || !participation.can_complete || !participation.hasFeedback} onClick={() => { if (participation.can_complete && participation.hasFeedback) run(() => completeParticipation(participation.participation_id)); }}><Check size={14} /><T id="tests.completeTest" /></button>}
+        {status === "access_enabled" && <button className="row-action row-action-strong" type="button" disabled={pending} onClick={() => run(() => confirmInstallation(participation.participation_id))}><PendingButtonContent pending={pending} label="loading.processing" announce={false}><Check size={14} /><T id="tests.confirmInstall" /></PendingButtonContent></button>}
+        {status === "active" && <button className={`row-action ${participation.can_complete && participation.hasFeedback ? "row-action-strong" : ""}`} type="button" disabled={pending || !participation.can_complete || !participation.hasFeedback} onClick={() => { if (participation.can_complete && participation.hasFeedback) run(() => completeParticipation(participation.participation_id)); }}><PendingButtonContent pending={pending} label="loading.processing" announce={false}><Check size={14} /><T id="tests.completeTest" /></PendingButtonContent></button>}
         <button className="row-action" type="button" disabled={pending} onClick={() => openEditor("incompatible")}><T id="tests.markIncompatible" /></button>
         <button className="row-action" type="button" disabled={pending} onClick={() => openEditor("abandon")}><T id="tests.abandon" /></button>
       </div>
@@ -62,11 +63,11 @@ export function ParticipationActions({ participation }: { participation: Pick<My
           <textarea value={reason} onChange={(event) => setReason(event.target.value)} required={editor === "incompatible"} disabled={pending} autoFocus />
         </label>
         <div className="participation-actions">
-          <button className="row-action row-action-strong" type="submit" disabled={pending || (editor === "incompatible" && !reason.trim())}><T id="tests.confirmAction" /></button>
+          <button className="row-action row-action-strong" type="submit" disabled={pending || (editor === "incompatible" && !reason.trim())}><PendingButtonContent pending={pending} label="tests.saving" announce={false}><T id="tests.confirmAction" /></PendingButtonContent></button>
           <button className="row-action" type="button" disabled={pending} onClick={() => { setEditor(null); setResult({}); }}><T id="tests.cancelAction" /></button>
         </div>
       </form>}
-      {pending && <p className="muted-cell" role="status"><T id="tests.saving" /></p>}
+      {pending && <InlineLoading label="tests.saving" />}
       {result.error && <p className="muted-cell" role="alert"><T id={errorKeys[result.error]} /></p>}
     </div>
   );

@@ -1,5 +1,6 @@
 "use client";
 import { useRef, useState, useTransition } from "react";
+import { InlineLoading, PendingButtonContent } from "@/components/loading-state";
 import { T, type TranslationKey } from "@/lib/i18n";
 import type { ParticipationStatus } from "@/lib/my-tests";
 import type { ParticipationFeedback } from "@/lib/participation-feedback";
@@ -44,11 +45,11 @@ export function ParticipationFeedbackSection({ participationId, status, feedback
     }}>
       <label className="field"><span><T id="feedback.title" /></span><textarea value={text} onChange={(event) => setText(event.target.value)} rows={4} required disabled={pending} /></label>
       <div className="participation-actions">
-        <button className="row-action row-action-strong" type="submit" disabled={pending || !text.trim()}><T id="feedback.save" /></button>
+        <button className="row-action row-action-strong" type="submit" disabled={pending || !text.trim()}><PendingButtonContent pending={pending} label="tests.saving" announce={false}><T id="feedback.save" /></PendingButtonContent></button>
         <button className="row-action" type="button" disabled={pending} onClick={() => { if (!inFlight.current) { setEditor(null); setResult({}); } }}><T id="tests.cancelAction" /></button>
       </div>
     </form>}
-    {pending && <p role="status"><T id="tests.saving" /></p>}
+    {pending && <InlineLoading label="tests.saving" />}
     {result.error && <p role="alert"><T id={errors[result.error]} /></p>}
   </section>;
 }

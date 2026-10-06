@@ -1,4 +1,5 @@
-import { T } from "@/lib/i18n";
-export default function ExploreLoading() {
-  return <div className="panel" aria-busy="true" role="status"><T id="explore.loading" /></div>;
+import { LoadingState } from "@/components/loading-state";
+
+export default function Loading() {
+  return <LoadingState label="explore.loading" />;
 }

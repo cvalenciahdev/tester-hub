@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { PendingButtonContent } from "@/components/loading-state";
 import { useActionState, useRef } from "react";
 import { T, type TranslationKey } from "@/lib/i18n";
 import type { OwnApp } from "@/lib/apps";
@@ -30,11 +31,10 @@ export function AppForm({ app }: { app?: OwnApp }) {
         {readOnly && <p className="muted-cell"><T id="apps.archivedReadOnly" /></p>}
         {state.error && <p className="muted-cell" role="alert"><T id={errors[state.error]} /></p>}
         {state.saved && <p className="muted-cell" role="status"><T id="apps.saved" /></p>}
-        {pending && <p className="muted-cell" role="status"><T id="apps.saving" /></p>}
       </section>
       <div className="form-actions">
         <Link className="button button-quiet" href="/apps"><T id="apps.back" /></Link>
-        {!readOnly && <button className="button button-primary" type="submit" disabled={pending}><T id={app ? "apps.saveChanges" : "apps.createApp"} /></button>}
+        {!readOnly && <button className="button button-primary" type="submit" disabled={pending}><PendingButtonContent pending={pending} label="apps.saving"><T id={app ? "apps.saveChanges" : "apps.createApp"} /></PendingButtonContent></button>}
       </div>
     </form>
   );

@@ -21,6 +21,7 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { LanguageSelector, useI18n, type TranslationKey } from "@/lib/i18n";
 import { logout } from "@/app/auth/actions";
+import { WorkspaceBreadcrumb, WorkspaceBreadcrumbProvider } from "./workspace-breadcrumb";
 
 const navigation: { label: TranslationKey; href: string; icon: LucideIcon }[] = [
   { label: "common.dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -67,6 +68,7 @@ export function AppShell({
   }
 
   return (
+    <WorkspaceBreadcrumbProvider>
     <div className="workspace">
       {mobileOpen && <button aria-label={t("common.closeMenu")} className="mobile-scrim" onClick={() => setMobileOpen(false)} />}
       <aside className={`sidebar ${mobileOpen ? "sidebar-open" : ""}`}>
@@ -118,7 +120,7 @@ export function AppShell({
           <button className="icon-button mobile-menu-button" aria-label={mobileOpen ? t("common.closeMenu") : t("common.openMenu")} onClick={() => setMobileOpen(!mobileOpen)}>
             {mobileOpen ? <X size={19} /> : <Menu size={19} />}
           </button>
-          <div className="breadcrumbs"><span>{t("shell.breadcrumbWorkspace")}</span><span className="crumb-separator">/</span><strong>{titleForPath(pathname, t)}</strong></div>
+          <WorkspaceBreadcrumb fallbackTitle={titleForPath(pathname, t)} />
           <div className="topbar-actions">
             <LanguageSelector />
             <button className="icon-button theme-button" aria-label={t("common.changeTheme")} onClick={toggleTheme}>
@@ -137,5 +139,6 @@ export function AppShell({
         </footer>
       </div>
     </div>
+    </WorkspaceBreadcrumbProvider>
   );
 }

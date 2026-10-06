@@ -1,1 +1,5 @@
-export { default } from "../../../apps/loading";
+import { LoadingState } from "@/components/loading-state";
+
+export default function Loading() {
+  return <LoadingState label="loading.campaigns" />;
+}

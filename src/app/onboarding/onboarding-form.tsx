@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { PendingButtonContent } from "@/components/loading-state";
 import { ArrowRight } from "lucide-react";
 import { completeOnboarding, type OnboardingFormState } from "@/app/onboarding/actions";
 import { T, useI18n } from "@/lib/i18n";
@@ -119,8 +120,7 @@ export function OnboardingForm({
 
       <div className="form-actions">
         <button className="button button-primary" disabled={pending} type="submit">
-          {pending ? t("onboarding.saving") : t("onboarding.continue")}
-          {!pending && <ArrowRight size={16} />}
+          <PendingButtonContent pending={pending} label="onboarding.saving">{t("onboarding.continue")}<ArrowRight size={16} /></PendingButtonContent>
         </button>
       </div>
     </form>

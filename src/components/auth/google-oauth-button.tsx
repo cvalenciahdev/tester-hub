@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { PendingButtonContent } from "@/components/loading-state";
 import { useI18n } from "@/lib/i18n";
 import { createClient } from "@/lib/supabase/client";
 
@@ -40,10 +41,8 @@ export function GoogleOAuthButton() {
         onClick={signInWithGoogle}
         type="button"
       >
-        <span className="google-g">G</span>
-        {t("auth.continueGoogle")}
+        <PendingButtonContent pending={pending} label="auth.startingGoogle"><span className="google-g">G</span>{t("auth.continueGoogle")}</PendingButtonContent>
       </button>
-      {pending && <p role="status">{t("auth.startingGoogle")}</p>}
       {error && <p className="auth-error" role="alert">{t("auth.googleError")}</p>}
     </>
   );
