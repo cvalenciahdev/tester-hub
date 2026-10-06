@@ -1,0 +1,26 @@
+.overview {
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px 28px;
+  margin-top: 0;
+  margin-bottom: 17px;
+}
+
+.overview .actions {
+  flex-shrink: 0;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.actions select {
+  min-height: 34px;
+  width: auto;
+  max-width: 115px;
+  padding: 0 27px 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 9px;
+}

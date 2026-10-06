@@ -17,7 +17,7 @@ export default async function AppCampaignsPage({ params, searchParams }: PagePro
       <Link href="/apps"><T id="apps.title" /></Link><span>/</span>
       <Link href={`/apps/${app.id}`}>{app.name}</Link><span>/</span><span><T id="apps.campaigns" /></span>
     </nav>
-    <PageHeading eyebrow={<T id="apps.campaigns" />} title={app.name} description={app.description ?? ""} action={app.archived_at === null ? <Link className="button button-primary" href={`/apps/${app.id}/campaigns/new`}><T id="apps.newCampaign" /></Link> : undefined} />
+    <PageHeading title={app.name} description={app.description ?? ""} action={app.archived_at === null ? <Link className="button button-primary" href={`/apps/${app.id}/campaigns/new`}><T id="apps.newCampaign" /></Link> : undefined} />
     <AppRounds appId={app.id} appName={app.name} rounds={rounds} filter={filter} archived={app.archived_at !== null} />
   </>;
 }

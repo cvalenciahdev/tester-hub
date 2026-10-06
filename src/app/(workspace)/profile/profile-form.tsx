@@ -1,7 +1,6 @@
 "use client";
 import { useActionState, useRef, useState } from "react";
 import { LockKeyhole, Mail, Smartphone } from "lucide-react";
-import { PageHeading } from "@/components/ui";
 import { CurrentLanguageName, T, type TranslationKey, useI18n } from "@/lib/i18n";
 import type { ProfileData } from "@/lib/profile";
 import type { ProfileError, ProfileResult } from "@/lib/profile-input";
@@ -41,7 +40,7 @@ export function ProfileForm({ data }: { data: ProfileData }) {
   const serialized = devices.map((device) => ({ ...(device.id ? { id: device.id } : {}), platform: device.platform,
     os_major: device.major === "" ? null : Number(device.major), os_minor: device.minor === "" ? null : Number(device.minor), model: device.model }));
   return <>
-    <PageHeading eyebrow={<T id="profile.eyebrow" />} title={<T id="profile.title" />} description={<T id="profile.description" />} action={<button className="button button-primary" form="profile-form" type="submit" disabled={pending}><T id="profile.save" /></button>} />
+    <h1 className="sr-only"><T id="profile.title" /></h1>
     <form id="profile-form" action={action} aria-busy={pending} onSubmit={(event) => {
       if (pending || inFlight.current) event.preventDefault(); else inFlight.current = true;
     }}>
@@ -49,7 +48,7 @@ export function ProfileForm({ data }: { data: ProfileData }) {
       <div className="profile-layout">
         <div className="profile-main">
           <section className="panel profile-card">
-            <div className="profile-section-head"><div><h2><T id="profile.personalInfo" /></h2><p><T id="profile.personalDescription" /></p></div></div>
+            <div className="profile-section-head"><div><h2><T id="profile.personalInfo" /></h2><p><T id="profile.personalDescription" /></p></div><button className="button button-primary" form="profile-form" type="submit" disabled={pending}><T id="profile.save" /></button></div>
             <div className="profile-identity"><span className="profile-big-avatar">{initials || "—"}</span><div><strong>{name.trim() || "—"}</strong><span><T id="profile.created" /> <time dateTime={data.profile.created_at}>{new Intl.DateTimeFormat(language === "es" ? "es-MX" : "en-US", { dateStyle: "medium", timeZone: "America/Cancun" }).format(new Date(data.profile.created_at))}</time></span></div></div>
             <div className="profile-fields">
               <label className="field"><span><T id="profile.name" /></span><input name="display_name" value={name} onChange={(event) => setName(event.target.value)} disabled={pending} /></label>

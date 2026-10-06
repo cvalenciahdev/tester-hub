@@ -1,0 +1,108 @@
+.card {
+  container-type: inline-size;
+  padding: 15px;
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+}
+
+.header .icon {
+  width: 42px;
+  height: 42px;
+}
+
+.copy {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.copy h3 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin: 0;
+  color: var(--text-strong);
+  font-family: Manrope, sans-serif;
+  font-size: 13px;
+}
+
+.copy p {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.55;
+}
+
+.copy p:empty {
+  margin: 0;
+}
+
+.card > small {
+  display: block;
+  margin-top: 8px;
+}
+
+.card .facts {
+  gap: 12px;
+  margin: 12px 0;
+  padding: 0;
+  border-top: 0;
+}
+
+.facts span {
+  min-width: 0;
+}
+
+.card .actions {
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 0;
+  border-top: 0;
+}
+
+.actions .campaigns {
+  border-color: var(--blue-soft);
+  background: var(--blue-soft);
+  color: var(--blue);
+}
+
+.actions .campaigns:hover {
+  border-color: var(--blue);
+  background: var(--blue-soft);
+}
+
+@container (max-width: 220px) {
+  .header {
+    grid-template-columns: 42px minmax(0, 1fr);
+  }
+
+  .header > :last-child {
+    grid-column: 1 / -1;
+    justify-self: end;
+  }
+
+  .card .facts {
+    gap: 4px;
+    font-size: 8px;
+  }
+
+  .facts span {
+    gap: 3px;
+    white-space: nowrap;
+  }
+
+  .facts svg {
+    width: 11px;
+    height: 11px;
+    flex-shrink: 0;
+  }
+}

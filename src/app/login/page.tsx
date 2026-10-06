@@ -22,20 +22,66 @@ export default async function LoginPage({
 
   return (
     <main className="auth-page">
-      <div className="auth-language"><LanguageSelector /></div>
-      <div className="auth-brand"><span className="brand-symbol"><FlaskConical size={18} /></span> tester<span className="brand-light">hub</span></div>
-      <div className="auth-card">
-        <div className="auth-icon"><UsersRound size={22} /></div>
-        <div className="eyebrow"><T id="auth.eyebrow" /></div>
-        <h1><T id="auth.title" /></h1>
-        <p className="auth-description"><T id="auth.description" /></p>
-        <GoogleOAuthButton />
-        {error === "oauth_callback" && <p className="auth-error" role="alert"><T id="auth.googleError" /></p>}
-        <div className="auth-benefits">
-          <span><Check size={15} /> <T id="auth.benefitOne" /></span>
-          <span><Check size={15} /> <T id="auth.benefitTwo" /></span>
+      <div className="auth-header">
+        <div className="auth-brand">
+          <span className="brand-symbol">
+            <FlaskConical size={18} />
+          </span>
+          tester<span className="brand-light">hub</span>
         </div>
-        <p className="auth-terms"><T id="auth.termsPrefix" /> <a href="#terms"><T id="auth.terms" /></a> <T id="auth.and" /> <a href="#privacy"><T id="auth.privacy" /></a>.</p>
+
+        <div className="auth-language">
+          <LanguageSelector />
+        </div>
+      </div>
+
+      <div className="auth-card">
+        <div className="auth-icon">
+          <UsersRound size={22} />
+        </div>
+
+        <div className="eyebrow">
+          <T id="auth.eyebrow" />
+        </div>
+
+        <h1>
+          <T id="auth.title" />
+        </h1>
+
+        <p className="auth-description">
+          <T id="auth.description" />
+        </p>
+
+        <GoogleOAuthButton />
+
+        {error === "oauth_callback" && (
+          <p className="auth-error" role="alert">
+            <T id="auth.googleError" />
+          </p>
+        )}
+
+        <div className="auth-benefits">
+          <span>
+            <Check size={15} />
+            <T id="auth.benefitOne" />
+          </span>
+          <span>
+            <Check size={15} />
+            <T id="auth.benefitTwo" />
+          </span>
+        </div>
+
+        <p className="auth-terms">
+          <T id="auth.termsPrefix" />{" "}
+          <a href="#terms">
+            <T id="auth.terms" />
+          </a>{" "}
+          <T id="auth.and" />{" "}
+          <a href="#privacy">
+            <T id="auth.privacy" />
+          </a>
+          .
+        </p>
       </div>
     </main>
   );

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { EmptyHint, PageHeading } from "@/components/ui";
+import { EmptyHint } from "@/components/ui";
 import { T, type TranslationKey } from "@/lib/i18n";
 import { filterMyParticipations, getMyTestsData, parseMyTestsFilter, type ParticipationStatus } from "@/lib/my-tests";
 import { ParticipationActions } from "./participation-actions";
@@ -21,7 +21,7 @@ export default async function MyTestsPage({ searchParams }: PageProps<"/my-tests
   const participations = filterMyParticipations(data.participations, filter);
   return (
     <>
-      <PageHeading eyebrow={<T id="tests.eyebrow" />} title={<T id="tests.title" />} description={<T id="tests.description" />} />
+      <h1 className="sr-only"><T id="tests.title" /></h1>
       <div className="test-summary-strip">
         <div><span className="summary-dot dot-blue" /><strong>{data.metrics.in_progress}</strong><span><T id="tests.inProgress" /></span></div>
         <div><span className="summary-dot dot-amber" /><strong>{data.metrics.waiting_access}</strong><span><T id="dashboard.waitingAccess" /></span></div>

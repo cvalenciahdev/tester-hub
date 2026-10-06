@@ -24,9 +24,9 @@ import { logout } from "@/app/auth/actions";
 
 const navigation: { label: TranslationKey; href: string; icon: LucideIcon }[] = [
   { label: "common.dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "common.exploreTests", href: "/explore", icon: Compass },
   { label: "common.myTests", href: "/my-tests", icon: ClipboardList },
   { label: "common.myApps", href: "/apps", icon: Smartphone },
+  { label: "common.exploreTests", href: "/explore", icon: Compass },
   { label: "common.profile", href: "/profile", icon: UserRound },
 ];
 

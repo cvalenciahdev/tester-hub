@@ -11,7 +11,7 @@ export default function CampaignFormPage() {
   return (
     <>
       <Link className="back-link" href="/campaigns"><ArrowLeft size={16} /> <T id="campaignForm.back" /></Link>
-      <PageHeading eyebrow={<T id="campaigns.eyebrow" />} title={<T id="campaignForm.title" />} description={<T id="campaignForm.description" />} />
+      <PageHeading title={<T id="campaignForm.title" />} />
       <div className="campaign-form-layout">
         <form className="panel campaign-form">
           <section className="form-section"><div className="form-section-heading"><span className="section-number">01</span><div><h2><T id="campaignForm.general" /></h2><p><T id="campaignForm.generalDescription" /></p></div></div>

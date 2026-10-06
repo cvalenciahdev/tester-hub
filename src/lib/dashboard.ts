@@ -3,12 +3,15 @@ import "server-only";
 import { createClient } from "@/lib/supabase/server";
 
 export type DashboardData = {
-  display_name: string | null;
+  initial_intent: "tester" | "developer" | "both" | null;
   metrics: {
     active_campaigns: number;
-    my_tests: number;
+    tester_active_tests: number;
     waiting_for_access: number;
-    active_testers: number;
+    feedback_pending: number;
+    ready_to_complete: number;
+    owner_waiting_access: number;
+    owner_testers_in_progress: number;
     completed_campaigns: number;
   };
   tests: {
@@ -22,13 +25,7 @@ export type DashboardData = {
     duration_days: number;
     progress_percent: number | null;
   }[];
-  recent_activity: {
-    event_type: string;
-    created_at: string;
-    campaign_id: string;
-    app_name: string;
-    is_own_participation: boolean;
-  }[];
+  recent_activity: { tester: DashboardActivity[]; developer: DashboardActivity[] };
   campaigns_for_you: {
     campaign_id: string;
     app_id: string;
@@ -44,6 +41,12 @@ export type DashboardData = {
     available_slots: number;
   }[];
 };
+export type DashboardActivity = {
+  event_type: string;
+  created_at: string;
+  campaign_id: string;
+  app_name: string;
+};
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -54,7 +57,17 @@ function isNullableString(value: unknown): value is string | null {
 }
 
 function isInteger(value: unknown): value is number {
-  return typeof value === "number" && Number.isInteger(value);
+  return typeof value === "number" && Number.isSafeInteger(value) && value >= 0;
+}
+
+function isActivity(value: unknown): value is DashboardActivity[] {
+  return Array.isArray(value) && value.length <= 3 && value.every((event) =>
+    isRecord(event) &&
+    typeof event.event_type === "string" &&
+    typeof event.created_at === "string" &&
+    typeof event.campaign_id === "string" &&
+    typeof event.app_name === "string",
+  );
 }
 
 function isDashboardData(value: unknown): value is DashboardData {
@@ -68,11 +81,14 @@ function isDashboardData(value: unknown): value is DashboardData {
   const campaigns = value.campaigns_for_you;
 
   return (
-    isNullableString(value.display_name) &&
+    (value.initial_intent === null || value.initial_intent === "tester" || value.initial_intent === "developer" || value.initial_intent === "both") &&
     isInteger(metrics.active_campaigns) &&
-    isInteger(metrics.my_tests) &&
+    isInteger(metrics.tester_active_tests) &&
     isInteger(metrics.waiting_for_access) &&
-    isInteger(metrics.active_testers) &&
+    isInteger(metrics.feedback_pending) &&
+    isInteger(metrics.ready_to_complete) &&
+    isInteger(metrics.owner_waiting_access) &&
+    isInteger(metrics.owner_testers_in_progress) &&
     isInteger(metrics.completed_campaigns) &&
     Array.isArray(tests) &&
     tests.length <= 3 &&
@@ -94,17 +110,7 @@ function isDashboardData(value: unknown): value is DashboardData {
             test.progress_percent >= 0 &&
             test.progress_percent <= 100)),
     ) &&
-    Array.isArray(activity) &&
-    activity.length <= 3 &&
-    activity.every(
-      (event) =>
-        isRecord(event) &&
-        typeof event.event_type === "string" &&
-        typeof event.created_at === "string" &&
-        typeof event.campaign_id === "string" &&
-        typeof event.app_name === "string" &&
-        typeof event.is_own_participation === "boolean",
-    ) &&
+    isRecord(activity) && isActivity(activity.tester) && isActivity(activity.developer) &&
     Array.isArray(campaigns) &&
     campaigns.length <= 3 &&
     campaigns.every(
@@ -134,12 +140,59 @@ export async function getDashboardData(): Promise<DashboardData> {
   const { data, error } = await supabase.rpc("get_dashboard_data");
 
   if (error) {
-    throw error;
+    throw new Error("Dashboard could not be loaded.");
   }
 
   if (!isDashboardData(data)) {
     throw new Error("Dashboard RPC returned an invalid response.");
   }
 
-  return data;
+  const activity = (rows: DashboardActivity[]) => rows.map((row) => ({
+    event_type: row.event_type,
+    created_at: row.created_at,
+    campaign_id: row.campaign_id,
+    app_name: row.app_name,
+  }));
+  return {
+    initial_intent: data.initial_intent,
+    metrics: {
+      active_campaigns: data.metrics.active_campaigns,
+      tester_active_tests: data.metrics.tester_active_tests,
+      waiting_for_access: data.metrics.waiting_for_access,
+      feedback_pending: data.metrics.feedback_pending,
+      ready_to_complete: data.metrics.ready_to_complete,
+      owner_waiting_access: data.metrics.owner_waiting_access,
+      owner_testers_in_progress: data.metrics.owner_testers_in_progress,
+      completed_campaigns: data.metrics.completed_campaigns,
+    },
+    tests: data.tests.map((row) => ({
+      participation_id: row.participation_id,
+      campaign_id: row.campaign_id,
+      app_id: row.app_id,
+      app_name: row.app_name,
+      status: row.status,
+      installed_at: row.installed_at,
+      expected_end_at: row.expected_end_at,
+      duration_days: row.duration_days,
+      progress_percent: row.progress_percent,
+    })),
+    recent_activity: {
+      tester: activity(data.recent_activity.tester),
+      developer: activity(data.recent_activity.developer),
+    },
+    campaigns_for_you: data.campaigns_for_you.map((row) => ({
+      campaign_id: row.campaign_id,
+      app_id: row.app_id,
+      app_name: row.app_name,
+      app_description: row.app_description,
+      platform: row.platform,
+      status: row.status,
+      duration_days: row.duration_days,
+      target_testers: row.target_testers,
+      all_countries: row.all_countries,
+      country_codes: [...row.country_codes],
+      covered_testers: row.covered_testers,
+      available_slots: row.available_slots,
+    })),
+  };
 }

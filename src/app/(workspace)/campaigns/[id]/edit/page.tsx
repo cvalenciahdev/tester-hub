@@ -14,7 +14,7 @@ export default async function EditRoundPage({ params }: PageProps<"/campaigns/[i
   if (!campaign) notFound();
   return <>
     <Link className="back-link" href={`/apps/${campaign.app_id}/campaigns`}><ArrowLeft size={16} /><T id="apps.backToCampaigns" /></Link>
-    <PageHeading eyebrow={<T id="roundForm.edit" />} title={campaign.app_name} description={campaign.app_description ?? ""} action={<span className="badge badge-neutral"><T id={statusKeys[campaign.status]} /></span>} />
+    <PageHeading title={campaign.app_name} description={campaign.app_description ?? ""} action={<span className="badge badge-neutral"><T id={statusKeys[campaign.status]} /></span>} />
     <p className="muted-cell">{campaign.id}</p>
     <CampaignForm appId={campaign.app_id} campaign={campaign} />
   </>;

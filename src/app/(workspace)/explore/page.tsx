@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { EmptyHint, PageHeading } from "@/components/ui";
+import { EmptyHint } from "@/components/ui";
 import { T } from "@/lib/i18n";
 import { getExploreData, parseExploreQuery } from "@/lib/explore";
 import { ExploreControls } from "./explore-controls";
@@ -19,7 +19,7 @@ export default async function ExplorePage({ searchParams }: PageProps<"/explore"
     : false;
   return (
     <>
-      <PageHeading eyebrow={<T id="explore.eyebrow" />} title={<T id="explore.title" />} description={<T id="explore.description" />} />
+      <h1 className="sr-only"><T id="explore.title" /></h1>
       <ExploreControls query={query} />
       <div className="campaign-results-heading"><h2>{totalCount} <T id="explore.available" /></h2></div>
       {campaigns.length === 0 ? (
