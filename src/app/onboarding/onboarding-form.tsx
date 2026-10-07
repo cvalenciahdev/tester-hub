@@ -8,12 +8,7 @@ import { T, useI18n } from "@/lib/i18n";
 import type { TranslationKey } from "@/lib/i18n";
 import type { OnboardingProfile } from "@/lib/auth";
 
-type ExistingDevice = {
-  platform: "android" | "ios";
-  os_major: number;
-  os_minor: number | null;
-  model: string | null;
-};
+type ExistingDevice = { platform: "android" | "ios" };
 
 const initialState: OnboardingFormState = {};
 const intentOptions: {
@@ -40,8 +35,6 @@ export function OnboardingForm({
   const [platform, setPlatform] = useState(
     hasAndroid && hasIos ? "both" : hasIos ? "ios" : hasAndroid ? "android" : "",
   );
-  const android = devices.find((device) => device.platform === "android");
-  const ios = devices.find((device) => device.platform === "ios");
 
   return (
     <form action={action}>
@@ -86,12 +79,6 @@ export function OnboardingForm({
         </select>
       </label>
 
-      {(platform === "android" || platform === "both") && (
-        <DeviceFields device={android} platform="android" />
-      )}
-      {(platform === "ios" || platform === "both") && (
-        <DeviceFields device={ios} platform="ios" />
-      )}
 
       <fieldset className="intent-options">
         <legend><T id="onboarding.intentQuestion" /></legend>
@@ -124,58 +111,5 @@ export function OnboardingForm({
         </button>
       </div>
     </form>
-  );
-}
-
-function DeviceFields({
-  device,
-  platform,
-}: {
-  device: ExistingDevice | undefined;
-  platform: "android" | "ios";
-}) {
-  const { t } = useI18n();
-  const idPrefix = `onboarding-${platform}`;
-
-  return (
-    <fieldset className="device-fields">
-      <legend>{platform === "android" ? "Android" : "iOS"}</legend>
-      <div className="form-grid">
-        <label className="field">
-          <span><T id="onboarding.systemMajor" /> <b>*</b></span>
-          <input
-            defaultValue={device?.os_major ?? ""}
-            id={`${idPrefix}-major`}
-            min="0"
-            max="32767"
-            name={`${platform}_os_major`}
-            required
-            step="1"
-            type="number"
-          />
-        </label>
-        <label className="field">
-          <span><T id="onboarding.systemMinor" /> <small><T id="onboarding.optional" /></small></span>
-          <input
-            defaultValue={device?.os_minor ?? ""}
-            id={`${idPrefix}-minor`}
-            min="0"
-            max="32767"
-            name={`${platform}_os_minor`}
-            step="1"
-            type="number"
-          />
-        </label>
-        <label className="field field-full">
-          <span><T id="onboarding.deviceModel" /> <small><T id="onboarding.optional" /></small></span>
-          <input
-            defaultValue={device?.model ?? ""}
-            id={`${idPrefix}-model`}
-            name={`${platform}_model`}
-            placeholder={t("onboarding.devicePlaceholder")}
-          />
-        </label>
-      </div>
-    </fieldset>
   );
 }

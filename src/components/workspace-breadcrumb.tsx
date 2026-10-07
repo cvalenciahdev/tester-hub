@@ -7,7 +7,7 @@ import { useI18n, type TranslationKey } from "@/lib/i18n";
 import styles from "./workspace-breadcrumb.module.css";
 
 type BreadcrumbItem = ({ label: string; translationKey?: never } | { translationKey: TranslationKey; label?: never }) & { href?: string };
-type Breadcrumb = { pathname: string; items: BreadcrumbItem[] };
+type Breadcrumb = { pathname: string; items: BreadcrumbItem[]; workspaceHref?: string };
 const BreadcrumbContext = createContext<{
   breadcrumb: Breadcrumb | null;
   setBreadcrumb: Dispatch<SetStateAction<Breadcrumb | null>>;
@@ -25,13 +25,13 @@ export function WorkspaceBreadcrumbProvider({ children }: { children: ReactNode 
   return <BreadcrumbContext.Provider value={value}>{children}</BreadcrumbContext.Provider>;
 }
 
-export function SetWorkspaceBreadcrumb({ pathname, items }: Breadcrumb) {
+export function SetWorkspaceBreadcrumb({ pathname, items, workspaceHref }: Breadcrumb) {
   const { setBreadcrumb } = useBreadcrumb();
   useEffect(() => {
-    const breadcrumb = { pathname, items };
+    const breadcrumb = { pathname, items, workspaceHref };
     setBreadcrumb(breadcrumb);
     return () => setBreadcrumb((current) => current === breadcrumb ? null : current);
-  }, [pathname, items, setBreadcrumb]);
+  }, [pathname, items, workspaceHref, setBreadcrumb]);
   return null;
 }
 
@@ -43,8 +43,8 @@ export function WorkspaceBreadcrumb({ fallbackTitle }: { fallbackTitle: string }
     return <div className="breadcrumbs"><span>{t("shell.breadcrumbWorkspace")}</span><span className="crumb-separator">/</span><strong>{fallbackTitle}</strong></div>;
   }
   return (
-    <nav className={`breadcrumbs ${styles.contextual}`} aria-label={t("shell.breadcrumbLabel")}>
-      <div className={styles.part}><span className={styles.label}>{t("shell.breadcrumbWorkspace")}</span></div>
+    <nav className={`breadcrumbs ${styles.contextual}${breadcrumb.items.length > 3 ? ` ${styles.deep}` : ""}`} aria-label={t("shell.breadcrumbLabel")}>
+      <div className={styles.part}>{breadcrumb.workspaceHref ? <Link className={styles.label} href={breadcrumb.workspaceHref}>{t("shell.breadcrumbWorkspace")}</Link> : <span className={styles.label}>{t("shell.breadcrumbWorkspace")}</span>}</div>
       {breadcrumb.items.map((item, index) => {
         const label = item.translationKey ? t(item.translationKey) : item.label;
         const current = index === breadcrumb.items.length - 1;

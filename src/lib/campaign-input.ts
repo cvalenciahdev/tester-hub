@@ -1,5 +1,5 @@
 export type CampaignError = "auth" | "unavailable" | "archived" | "state" | "locked" | "target" | "duration" | "os" | "countries" | "platform" | "failed";
-export type CampaignResult = { error?: CampaignError; saved?: boolean };
+export type CampaignResult = { error?: CampaignError; saved?: boolean; createdCampaign?: { id: string; confirmedDraft: boolean } };
 export function campaignError(error: { message?: string; code?: string }): CampaignError {
   const known: Record<string, CampaignError> = {
     NOT_AUTHENTICATED: "auth", APP_NOT_FOUND: "unavailable", CAMPAIGN_NOT_FOUND: "unavailable",

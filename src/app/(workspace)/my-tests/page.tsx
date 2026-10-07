@@ -4,7 +4,6 @@ import { T, type TranslationKey } from "@/lib/i18n";
 import { filterMyParticipations, getMyTestsData, parseMyTestsFilter, type ParticipationStatus } from "@/lib/my-tests";
 import { ParticipationActions } from "./participation-actions";
 import { MyTestsEndDate, MyTestsFilterControl } from "./my-tests-controls";
-import { ParticipationFeedbackSection } from "./participation-feedback";
 
 const statuses: Record<ParticipationStatus, { key: TranslationKey; style: string }> = {
   waiting_access: { key: "status.Waiting access", style: "badge-amber" },
@@ -33,7 +32,7 @@ export default async function MyTestsPage({ searchParams }: PageProps<"/my-tests
           <T id={data.participations.length === 0 ? "tests.empty" : "tests.emptyFiltered"} />{" "}
           <Link className="text-link" href={data.participations.length === 0 ? "/explore" : "/my-tests"}><T id={data.participations.length === 0 ? "tests.explore" : "tests.backToAll"} /></Link>
         </EmptyHint> : <div className="table-scroll"><table>
-          <thead><tr><th><T id="campaigns.name" /></th><th><T id="campaigns.status" /></th><th><T id="tests.ending" /></th><th><T id="tests.action" /></th><th /></tr></thead>
+          <thead><tr><th><T id="campaigns.name" /></th><th><T id="campaigns.status" /></th><th><T id="tests.ending" /></th><th><T id="tests.action" /></th></tr></thead>
           <tbody>{participations.map((row) => {
             const status = statuses[row.participation_status];
             const initials = row.app_name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase();
@@ -41,7 +40,7 @@ export default async function MyTestsPage({ searchParams }: PageProps<"/my-tests
               <td><div className="table-app"><span className={`app-mark app-mark-small mark-${row.platform === "ios" ? "lavender" : "mint"}`}>{initials}</span><span><strong>{row.app_name}</strong><small><T id={row.platform === "android" ? "explore.android" : "explore.ios"} /></small></span></div></td>
               <td><span className={`badge ${status.style}`}><T id={status.key} /></span></td>
               <td className="muted-cell"><MyTestsEndDate value={row.expected_end_at} /></td>
-              <td>{(row.participation_status === "access_enabled" || row.participation_status === "active") && row.store_url && <a className="row-action row-action-strong" href={row.store_url} target="_blank" rel="noopener noreferrer"><T id="tests.openInstallation" /></a>}<ParticipationActions participation={{ participation_id: row.participation_id, participation_status: row.participation_status, can_complete: row.can_complete, hasFeedback: row.feedbacks.length > 0 }} /><ParticipationFeedbackSection participationId={row.participation_id} status={row.participation_status} feedbacks={row.feedbacks} /></td><td />
+              <td><ParticipationActions participation={row} /></td>
             </tr>;
           })}</tbody>
         </table></div>}

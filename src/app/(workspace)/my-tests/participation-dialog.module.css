@@ -1,0 +1,47 @@
+.rowActions { display: flex; align-items: center; gap: 12px; white-space: nowrap; }
+.dialog {
+  width: min(560px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - 40px);
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.5;
+  overflow: auto;
+  overscroll-behavior: contain;
+  white-space: normal;
+}
+.dialog::backdrop { background: rgb(15 23 42 / 42%); }
+.header { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; background: var(--surface); border-bottom: 1px solid var(--line); }
+.header h2 { margin: 0; color: var(--text-strong); font-size: 16px; }
+.content { padding: 20px; min-width: 0; overflow-wrap: anywhere; }
+.identity { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.identity strong { font-size: 14px; }
+.section { margin-top: 20px; }
+.section h3 { margin: 0 0 10px; font-size: 13px; color: var(--text-strong); }
+.dates { display: grid; grid-template-columns: minmax(0, 130px) minmax(0, 1fr); gap: 8px 12px; margin: 0; }
+.dates dt { color: var(--muted); }
+.dates dd { margin: 0; min-width: 0; }
+.reason { white-space: pre-wrap; }
+.footer { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+.menu {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  width: 240px;
+  max-width: calc(100vw - 24px);
+  max-height: calc(100dvh - 24px);
+  overflow: auto;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 8px 24px rgb(15 23 42 / 12%);
+}
+.menu [role="menuitem"] { display: block; width: 100%; padding: 9px 10px; border: 0; border-radius: 5px; background: transparent; color: inherit; font-size: 11px; text-align: left; white-space: normal; text-decoration: none; cursor: pointer; }
+.menu [role="menuitem"]:hover, .menu [role="menuitem"]:focus-visible { background: var(--surface-soft); }
+.menu [role="menuitem"]:disabled { color: var(--muted); cursor: default; opacity: .65; }

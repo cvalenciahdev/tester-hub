@@ -12,8 +12,8 @@ export default async function AppPage({ params }: PageProps<"/apps/[id]">) {
   const app = await getOwnApp(id);
   if (!app) notFound();
   return <>
-    <Link className="back-link" href="/apps"><ArrowLeft size={16} /><T id="apps.back" /></Link>
-    <PageHeading title={app.name} description={app.description ?? ""} action={<Badge status={app.archived_at === null ? "Activa" : "Archivada"} />} />
+    
+    <PageHeading title="" description="" action={<Badge status={app.archived_at === null ? "Activa" : "Archivada"} />} />
     <p className="muted-cell"><AppArchivedAt value={app.archived_at} /></p>
     <AppForm app={app} />
   </>;

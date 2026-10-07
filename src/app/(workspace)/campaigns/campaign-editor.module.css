@@ -1,0 +1,72 @@
+.heading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.heading h1 {
+  margin: 0;
+  color: var(--text-strong);
+  font-family: Manrope, sans-serif;
+  font-size: clamp(25px, 2.4vw, 31px);
+  font-weight: 700;
+  letter-spacing: -1.15px;
+  line-height: 1.25;
+}
+
+.editLayout {
+  min-width: 0;
+}
+
+.editLayout input[type="number"] {
+  max-width: 160px;
+}
+
+.editLayout input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  min-height: 0;
+  margin: 0 6px 0 0;
+  padding: 0;
+  vertical-align: middle;
+}
+
+.editLayout select[name="platform"] {
+  max-width: 240px;
+}
+
+.versionHelp {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.editLayout .saveActions > :first-child {
+  margin-right: 0;
+}
+
+.lifecycle {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.lifecycle form {
+  margin-bottom: 16px;
+}
+
+.lifecycle details form {
+  max-width: 480px;
+  margin-top: 12px;
+}
+
+.cancel {
+  color: #c66d68;
+  cursor: pointer;
+}

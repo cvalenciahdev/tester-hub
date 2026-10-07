@@ -1,13 +1,14 @@
 "use client";
 import { useActionState, useRef, useState } from "react";
 import { PendingButtonContent } from "@/components/loading-state";
+import { formatKnownOsVersion, unknownDevice } from "@/lib/device-os";
 import { LockKeyhole, Mail, Smartphone } from "lucide-react";
 import { CurrentLanguageName, T, type TranslationKey, useI18n } from "@/lib/i18n";
 import type { ProfileData } from "@/lib/profile";
-import type { ProfileError, ProfileResult } from "@/lib/profile-input";
+import type { ProfileDevice, ProfileError, ProfileResult } from "@/lib/profile-input";
 import { updateMyProfile } from "./actions";
 
-type DeviceDraft = { key: string; id?: string; platform: "android" | "ios"; major: string; minor: string; model: string };
+type DeviceDraft = ProfileDevice & { key: string };
 const errors: Record<ProfileError, TranslationKey> = {
   country: "onboarding.error.invalidCountry", email: "onboarding.error.invalidEmail", intent: "onboarding.error.invalidIntent",
   devices: "profile.errorDevices", device: "profile.errorDevice", ownership: "profile.errorOwnership",
@@ -17,8 +18,7 @@ const intents = { tester: "onboarding.tryApps", developer: "onboarding.findTeste
 export function ProfileForm({ data }: { data: ProfileData }) {
   const { language } = useI18n();
   const inFlight = useRef(false), newDevice = useRef(0);
-  const [devices, setDevices] = useState<DeviceDraft[]>(data.devices.map((device) => ({ key: device.id, id: device.id,
-    platform: device.platform, major: String(device.os_major), minor: device.os_minor === null ? "" : String(device.os_minor), model: device.model ?? "" })));
+  const [devices, setDevices] = useState<DeviceDraft[]>(data.devices.map((device) => ({ ...device, key: device.id })));
   const [editor, setEditor] = useState<string | null>(null);
   const [name, setName] = useState(data.profile.display_name ?? "");
   const [country, setCountry] = useState(data.profile.country_code ?? "");
@@ -30,16 +30,18 @@ export function ProfileForm({ data }: { data: ProfileData }) {
     finally { inFlight.current = false; }
   }, {});
   const initials = name.trim().split(/\s+/).filter(Boolean).slice(0, 2).map((word) => word[0]).join("").toUpperCase();
-  function edit(key: string, fields: Partial<DeviceDraft>) {
-    setDevices((current) => current.map((device) => device.key === key ? { ...device, ...fields } : device));
+  function editPlatform(key: string, platform: DeviceDraft["platform"]) {
+    // OS/model metadata belongs to its platform; retain the device ID but
+    // reset metadata to unknown when changing to a different platform.
+    setDevices((current) => current.map((device) => device.key === key && device.platform !== platform ? { ...device, ...unknownDevice(platform) } : device));
   }
   function add(platform: "android" | "ios") {
     if (pending || inFlight.current || devices.length >= 2 || devices.some((device) => device.platform === platform)) return;
     const key = `new-${++newDevice.current}`;
-    setDevices((current) => [...current, { key, platform, major: "", minor: "", model: "" }]); setEditor(key);
+    setDevices((current) => [...current, { key, ...unknownDevice(platform) }]); setEditor(key);
   }
   const serialized = devices.map((device) => ({ ...(device.id ? { id: device.id } : {}), platform: device.platform,
-    os_major: device.major === "" ? null : Number(device.major), os_minor: device.minor === "" ? null : Number(device.minor), model: device.model }));
+    os_major: device.os_major, os_minor: device.os_minor, model: device.model }));
   return <>
     <h1 className="sr-only"><T id="profile.title" /></h1>
     <form id="profile-form" action={action} aria-busy={pending} onSubmit={(event) => {
@@ -61,12 +63,9 @@ export function ProfileForm({ data }: { data: ProfileData }) {
           <section className="panel profile-card">
             <div className="profile-section-head"><div><h2><T id="profile.devices" /></h2><p><T id="profile.devicesDescription" /></p></div><div>{(["android", "ios"] as const).filter((platform) => !devices.some((device) => device.platform === platform)).map((platform) => <button key={platform} className="quiet-link" type="button" disabled={pending || devices.length >= 2} onClick={() => add(platform)}><T id="profile.addDevice" /> {platform === "ios" ? "iOS" : "Android"}</button>)}</div></div>
             <div className="device-list">{devices.map((device) => <div key={device.key}>
-              <div className="device-row"><span className="device-round"><Smartphone size={19} /></span><span><strong>{device.model.trim() || (device.platform === "ios" ? "iOS" : "Android")}</strong><small>{device.platform === "ios" ? "iOS" : "Android"} {device.major}{device.minor !== "" ? `.${device.minor}` : ""}</small>{device.id && <small>{device.id}</small>}</span><button type="button" className="quiet-link" disabled={pending} onClick={() => setEditor(editor === device.key ? null : device.key)}><T id="common.edit" /></button><button type="button" className="quiet-link" disabled={pending || devices.length <= 1} onClick={() => { if (!pending && !inFlight.current && devices.length > 1) { setDevices((current) => current.filter((row) => row.key !== device.key)); if (editor === device.key) setEditor(null); } }}><T id="profile.removeDevice" /></button></div>
+              <div className="device-row"><span className="device-round"><Smartphone size={19} /></span><span><strong>{device.model?.trim() || (device.platform === "ios" ? "iOS" : "Android")}</strong><small>{device.platform === "ios" ? "iOS" : "Android"}{formatKnownOsVersion(device.os_major, device.os_minor) !== null && <> {formatKnownOsVersion(device.os_major, device.os_minor)}</>}</small>{device.id && <small>{device.id}</small>}</span><button type="button" className="quiet-link" disabled={pending} onClick={() => setEditor(editor === device.key ? null : device.key)}><T id="common.edit" /></button><button type="button" className="quiet-link" disabled={pending || devices.length <= 1} onClick={() => { if (!pending && !inFlight.current && devices.length > 1) { setDevices((current) => current.filter((row) => row.key !== device.key)); if (editor === device.key) setEditor(null); } }}><T id="profile.removeDevice" /></button></div>
               {editor === device.key && <div className="form-grid">
-                <label className="field"><span><T id="campaignForm.platform" /></span><select value={device.platform} disabled={pending} onChange={(event) => edit(device.key, { platform: event.target.value as DeviceDraft["platform"] })}>{(["android", "ios"] as const).map((platform) => <option key={platform} value={platform} disabled={devices.some((other) => other.key !== device.key && other.platform === platform)}>{platform === "ios" ? "iOS" : "Android"}</option>)}</select></label>
-                <label className="field"><span><T id="onboarding.systemMajor" /></span><input type="number" min={0} max={32767} step={1} value={device.major} disabled={pending} onChange={(event) => edit(device.key, { major: event.target.value })} /></label>
-                <label className="field"><span><T id="onboarding.systemMinor" /> (<T id="onboarding.optional" />)</span><input type="number" min={0} max={32767} step={1} value={device.minor} disabled={pending} onChange={(event) => edit(device.key, { minor: event.target.value })} /></label>
-                <label className="field"><span><T id="onboarding.deviceModel" /> (<T id="onboarding.optional" />)</span><input value={device.model} disabled={pending} onChange={(event) => edit(device.key, { model: event.target.value })} /></label>
+                <label className="field"><span><T id="campaignForm.platform" /></span><select value={device.platform} disabled={pending} onChange={(event) => editPlatform(device.key, event.target.value as DeviceDraft["platform"])}>{(["android", "ios"] as const).map((platform) => <option key={platform} value={platform} disabled={devices.some((other) => other.key !== device.key && other.platform === platform)}>{platform === "ios" ? "iOS" : "Android"}</option>)}</select></label>
               </div>}
             </div>)}</div>
           </section>

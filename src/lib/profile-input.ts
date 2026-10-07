@@ -1,3 +1,5 @@
+import { UNKNOWN_OS_MAJOR_VERSION, knownOsMajorVersion } from "@/lib/device-os";
+
 export type ProfileDevice = { id?: string; platform: "android" | "ios"; os_major: number; os_minor: number | null; model: string | null };
 export type ProfileInput = { display_name: string | null; country_code: string; testing_email: string; initial_intent: "tester" | "developer" | "both"; devices: ProfileDevice[] };
 export type ProfileError = "country" | "email" | "intent" | "devices" | "device" | "ownership" | "auth" | "missing" | "failed";
@@ -16,14 +18,16 @@ export function parseProfileInput(form: FormData): { input?: ProfileInput; error
   if (!Array.isArray(rows) || rows.length < 1 || rows.length > 2) return { error: "devices" };
   const devices: ProfileDevice[] = [], platforms = new Set(), ids = new Set();
   for (const row of rows) {
-    if (!row || typeof row !== "object" || (row.platform !== "android" && row.platform !== "ios") ||
-        !version(row.os_major) || (row.os_minor !== null && row.os_minor !== undefined && !version(row.os_minor)) ||
+    if (!row || typeof row !== "object") return { error: "device" };
+    const major = row.os_major === null || row.os_major === undefined || row.os_major === "" ? UNKNOWN_OS_MAJOR_VERSION : row.os_major;
+    if ((row.platform !== "android" && row.platform !== "ios") ||
+        !version(major) || (row.os_minor !== null && row.os_minor !== undefined && !version(row.os_minor)) ||
         (row.model !== null && row.model !== undefined && typeof row.model !== "string") ||
         (row.id !== null && row.id !== undefined && !isDeviceId(row.id))) return { error: "device" };
     if (platforms.has(row.platform) || (row.id && ids.has(row.id))) return { error: "devices" };
     platforms.add(row.platform); if (row.id) ids.add(row.id);
-    devices.push({ ...(row.id ? { id: row.id } : {}), platform: row.platform, os_major: row.os_major,
-      os_minor: row.os_minor ?? null, model: row.model?.trim() || null });
+    devices.push({ ...(row.id ? { id: row.id } : {}), platform: row.platform, os_major: major,
+      os_minor: knownOsMajorVersion(major) === null ? null : row.os_minor ?? null, model: row.model?.trim() || null });
   }
   return { input: { display_name: string("display_name") || null, country_code: country, testing_email: email, initial_intent: intent, devices } };
 }

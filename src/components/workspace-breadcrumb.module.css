@@ -33,4 +33,13 @@
     gap: 2px 5px;
     font-size: 9px;
   }
+
+  .deep {
+    row-gap: 1px;
+  }
+
+  .deep .label,
+  .deep .separator {
+    line-height: 1.1;
+  }
 }

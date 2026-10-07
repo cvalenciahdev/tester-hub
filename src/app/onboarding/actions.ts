@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { knownOsMajorVersion, unknownDevice } from "@/lib/device-os";
 import { getCurrentUser, getOnboardingStatus } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -11,40 +12,6 @@ export type OnboardingFormState = {
 function readString(formData: FormData, name: string): string {
   const value = formData.get(name);
   return typeof value === "string" ? value.trim() : "";
-}
-
-function parseDevice(formData: FormData, platform: "android" | "ios") {
-  const prefix = platform;
-  const osMajorValue = readString(formData, `${prefix}_os_major`);
-  const osMinorValue = readString(formData, `${prefix}_os_minor`);
-  const model = readString(formData, `${prefix}_model`);
-
-  if (!/^(0|[1-9]\d*)$/.test(osMajorValue)) {
-    return null;
-  }
-
-  const osMajor = Number(osMajorValue);
-  if (!Number.isSafeInteger(osMajor) || osMajor > 32767) {
-    return null;
-  }
-
-  let osMinor: number | null = null;
-  if (osMinorValue) {
-    if (!/^(0|[1-9]\d*)$/.test(osMinorValue)) {
-      return null;
-    }
-    osMinor = Number(osMinorValue);
-    if (!Number.isSafeInteger(osMinor) || osMinor > 32767) {
-      return null;
-    }
-  }
-
-  return {
-    platform,
-    os_major: osMajor,
-    os_minor: osMinor,
-    model: model || null,
-  };
 }
 
 export async function completeOnboarding(
@@ -90,10 +57,23 @@ export async function completeOnboarding(
     return { error: "invalidDevice" };
   }
 
-  const devices = platforms.map((platform) => parseDevice(formData, platform));
-  if (devices.some((device) => device === null)) {
-    return { error: "invalidDevice" };
+  // Removed version/model fields are not trusted inputs. Preserve metadata
+  // only from this authenticated user's stored devices.
+  const { data: existingDevices, error: devicesError } = await supabase
+    .from("user_devices")
+    .select("platform, os_major, os_minor, model")
+    .eq("user_id", user.id);
+  if (devicesError || !Array.isArray(existingDevices)) {
+    return { error: "saveFailed" };
   }
+  const devices = platforms.map((platform) => {
+    const existing = existingDevices.find((device) => device.platform === platform);
+    if (!existing) return unknownDevice(platform);
+    if (knownOsMajorVersion(existing.os_major) === null) {
+      return { ...unknownDevice(platform), model: existing.model };
+    }
+    return { platform, os_major: existing.os_major, os_minor: existing.os_minor, model: existing.model };
+  });
 
   const { error } = await supabase.rpc("complete_onboarding", {
     p_country_code: countryCode,
