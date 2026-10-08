@@ -17,17 +17,15 @@ function fields(formData: FormData) {
 export async function createApp(formData: FormData): Promise<AppMutationResult> {
   const input = fields(formData);
   if (!input) return { error: "nameRequired" };
-  let appId: string;
   try {
     const supabase = await createClient();
     const user = await getCurrentUser(supabase);
     if (!user) return { error: "notAuthenticated" };
     const { data, error } = await supabase.from("apps").insert({ owner_id: user.id, ...input }).select("id").single();
     if (error || !data || !isAppId(data.id)) return { error: "saveFailed" };
-    appId = data.id;
   } catch { return { error: "saveFailed" }; }
   revalidatePath("/apps");
-  redirect(`/apps/${appId}`);
+  redirect("/apps");
 }
 export async function updateApp(appId: string, formData: FormData): Promise<AppMutationResult> {
   if (!isAppId(appId)) return { error: "unavailable" };
@@ -44,5 +42,5 @@ export async function updateApp(appId: string, formData: FormData): Promise<AppM
   } catch { return { error: "saveFailed" }; }
   revalidatePath("/apps");
   revalidatePath(`/apps/${appId}`);
-  return { saved: true };
+  redirect("/apps");
 }

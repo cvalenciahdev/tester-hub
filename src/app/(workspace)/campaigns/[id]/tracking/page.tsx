@@ -44,7 +44,7 @@ export default async function TrackingPage({ params }: PageProps<"/campaigns/[id
             <td className="muted-cell"><TrackingDate value={row.joined_at} /></td>
             <td><Badge status={participationBadges[row.participation_status]} /></td>
             <td><ParticipationDetail participation={row} /></td>
-            <td><ParticipantActions campaignId={campaign.campaign_id} participationId={row.participation_id} status={row.participation_status} /></td>
+            <td><ParticipantActions campaignId={campaign.campaign_id} participationId={row.participation_id} displayName={name} status={row.participation_status} /></td>
           </tr>;
         })}</tbody>
       </table></div>}

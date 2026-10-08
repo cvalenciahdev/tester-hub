@@ -1,0 +1,33 @@
+.dialog {
+  width: min(440px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  overflow: auto;
+  overscroll-behavior: contain;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.dialog::backdrop { background: rgb(17 23 32 / 45%); }
+.header { padding: 16px 20px; border-bottom: 1px solid var(--line); }
+.header h2 { margin: 0; color: var(--text-strong); font-size: 16px; line-height: 1.35; }
+.content { padding: 18px 20px 20px; }
+.identity { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.identity strong { color: var(--text-strong); overflow-wrap: anywhere; }
+.confirmation { margin: 10px 0 18px; color: var(--muted); }
+.reason { width: 100%; min-height: 72px; margin-top: 7px; padding: 9px 10px; border: 1px solid var(--line-strong); border-radius: 6px; background: var(--surface); color: var(--text); font: inherit; resize: vertical; }
+.error { margin: 12px 0 0; color: #c66d68; }
+.footer { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+.destructive { background: #c85454; color: #fff; }
+.destructive:hover { background: #ad4141; }
+
+@media (max-width: 480px) {
+  .content { padding: 16px; }
+  .footer { flex-direction: column; }
+  .footer button { width: 100%; }
+}

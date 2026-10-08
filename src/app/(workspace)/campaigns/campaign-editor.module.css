@@ -17,11 +17,66 @@
 }
 
 .editLayout {
+  width: 100%;
+  max-width: 1080px;
+  margin-inline: auto;
   min-width: 0;
 }
 
+.editLayout > div {
+  min-width: 0;
+}
+
+.editLayout :global(.campaign-form) {
+  width: 100%;
+}
+
+.editLayout :global(.form-section) {
+  padding: 16px 20px;
+}
+
+.editLayout :global(.form-section + .form-section) {
+  border-top: 1px solid var(--line);
+}
+
+.editLayout :global(.form-section-heading) {
+  margin-bottom: 12px;
+}
+
+.editLayout :global(.form-grid) {
+  gap: 11px 14px;
+}
+
+.editLayout .generalGrid {
+  grid-template-columns: minmax(0, 1.4fr) minmax(180px, 0.8fr);
+}
+
+.editLayout .generalGrid > :nth-child(2) {
+  max-width: 270px;
+}
+
+.editLayout .requirementsGrid {
+  grid-template-columns: repeat(3, minmax(0, 160px));
+  margin-top: 12px;
+}
+
+.countriesField,
+.accessField {
+  min-width: 0;
+}
+
+.editLayout :global(.field input),
+.editLayout :global(.field select),
+.editLayout :global(.field textarea) {
+  min-width: 0;
+}
+
+.editLayout :global(.field textarea) {
+  max-height: 180px;
+}
+
 .editLayout input[type="number"] {
-  max-width: 160px;
+  max-width: 100%;
 }
 
 .editLayout input[type="checkbox"] {
@@ -34,7 +89,7 @@
 }
 
 .editLayout select[name="platform"] {
-  max-width: 240px;
+  max-width: 100%;
 }
 
 .versionHelp {
@@ -69,4 +124,29 @@
 .cancel {
   color: #c66d68;
   cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .editLayout .requirementsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 650px) {
+  .editLayout :global(.form-section) {
+    padding: 15px;
+  }
+
+  .editLayout .generalGrid,
+  .editLayout .requirementsGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .editLayout .generalGrid > :nth-child(2) {
+    max-width: none;
+  }
+
+  .editLayout .requirementsGrid {
+    margin-top: 11px;
+  }
 }

@@ -114,7 +114,7 @@ export function ParticipationActions({ participation }: { participation: MyParti
         <label className="field"><span><T id={view === "incompatible" ? "tests.requiredReason" : "tests.optionalReason"} /></span><textarea value={reason} onChange={(event) => setReason(event.target.value)} required={view === "incompatible"} disabled={pending} /></label>
         <div className={styles.footer}><button className="button button-secondary button-small" type="button" disabled={pending} onClick={close}><T id="tests.cancelAction" /></button><button className="button button-primary button-small" type="submit" disabled={pending || (view === "incompatible" && !reason.trim())}><PendingButtonContent pending={pending} label="tests.saving" announce={false}><T id="tests.confirmAction" /></PendingButtonContent></button></div>
       </form>}
-      {pending && <InlineLoading label="tests.saving" />}
+      {pending && view !== "incompatible" && view !== "abandon" && <InlineLoading label="tests.saving" />}
       {result.error && <p role="alert"><T id={errorKeys[result.error]} /></p>}
       {!pending && (view === "install" || view === "complete") && <div className={styles.footer}><button className="button button-secondary button-small" type="button" onClick={close}><T id="tests.closeDetail" /></button></div>}
     </ParticipationDialog>}

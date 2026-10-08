@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Bell,
   ChevronDown,
   ClipboardList,
   Compass,
@@ -94,7 +93,6 @@ export function AppShell({
               >
                 <Icon size={18} strokeWidth={1.8} />
                 <span>{t(label)}</span>
-                {label === "common.myTests" && <span className="nav-count">3</span>}
               </Link>
             );
           })}
@@ -125,9 +123,6 @@ export function AppShell({
             <LanguageSelector />
             <button className="icon-button theme-button" aria-label={t("common.changeTheme")} onClick={toggleTheme}>
               {dark ? <Sun size={18} /> : <Moon size={18} />}
-            </button>
-            <button className="icon-button notification-button" aria-label={t("common.notifications")}>
-              <Bell size={18} /><span />
             </button>
             <span className="top-avatar" aria-label={displayName} title={displayName}>{initials}</span>
           </div>

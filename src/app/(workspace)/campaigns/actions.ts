@@ -39,13 +39,11 @@ export async function createCampaign(appId: string, form: FormData): Promise<Cam
     if (result.error) {
       let current;
       try { current = await getOwnCampaign(id); } catch { /* Publication outcome may be unknown after a connection failure. */ }
-      if (current?.status !== "recruiting" && current?.status !== "testing") {
-        return { error: result.error, createdCampaign: { id, confirmedDraft: current?.status === "draft" } };
-      }
+      return { error: result.error, createdCampaign: { id, confirmedDraft: current?.status === "draft" } };
     }
     revalidatePath(`/apps/${appId}/campaigns`);
   }
-  redirect(`/campaigns/${id}/edit`);
+  redirect(`/apps/${appId}/campaigns`);
 }
 export async function mutateCampaign(id: string, form: FormData): Promise<CampaignResult> {
   if (!isAppId(id)) return { error: "unavailable" };
@@ -58,7 +56,7 @@ export async function mutateCampaign(id: string, form: FormData): Promise<Campai
     appId = campaign.app_id;
     const operation = form.get("operation");
     let result;
-    if (operation === "save") {
+    if (operation === "save" || operation === "save-and-publish") {
       const input = campaignInput(form, !campaign.has_participations);
       if (input.error) return { error: input.error };
       // A fresh server read determines the lock. No structural parameter is sent once any participation exists.
@@ -71,7 +69,14 @@ export async function mutateCampaign(id: string, form: FormData): Promise<Campai
       result = await supabase.rpc("cancel_campaign", { p_campaign_id: id, p_reason: typeof reason === "string" ? reason.trim() || null : null });
     } else return { error: "failed" };
     if (result.error) return { error: campaignError(result.error) };
+    if (operation === "save-and-publish") {
+      const publication = await supabase.rpc("publish_campaign", { p_campaign_id: id });
+      if (publication.error) return { error: campaignError(publication.error) };
+    }
   } catch { return { error: "failed" }; }
   refresh(appId, id);
+  if (form.get("operation") === "save" || form.get("operation") === "save-and-publish") {
+    redirect(`/apps/${appId}/campaigns`);
+  }
   return { saved: true };
 }

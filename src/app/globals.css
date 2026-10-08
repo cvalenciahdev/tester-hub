@@ -162,13 +162,12 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .breadcrumbs { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 12px; }
 .breadcrumbs strong { color: var(--text-strong); font-weight: 600; }
 .crumb-separator { color: var(--line-strong); }
-.topbar-actions { display: flex; align-items: center; gap: 16px; }
+.topbar-actions { display: flex; align-items: center; gap: 12px; }
 .language-selector select { min-height: 32px; padding: 0 25px 0 9px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); color: var(--text); font: inherit; font-size: 10px; cursor: pointer; }
 .language-selector select:focus-visible { outline: 2px solid #527df0; outline-offset: 2px; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; clip-path: inset(50%); }
 .icon-button { position: relative; display: grid; width: 34px; height: 34px; place-items: center; border: 0; border-radius: 8px; background: transparent; color: var(--muted); cursor: pointer; }
 .icon-button:hover { background: var(--surface-soft); color: var(--text-strong); }
-.notification-button > span { position: absolute; top: 7px; right: 7px; width: 6px; height: 6px; border: 1px solid var(--surface); border-radius: 50%; background: #e87568; }
 .top-avatar { display: grid; width: 31px; height: 31px; place-items: center; border: 0; border-radius: 50%; background: #efdbcb; color: #795842; font-size: 10px; font-weight: 700; cursor: pointer; }
 .mobile-menu-button { display: none; }
 .main-content { width: min(100%, 1440px); flex: 1; align-self: center; padding: 34px 42px 22px; }

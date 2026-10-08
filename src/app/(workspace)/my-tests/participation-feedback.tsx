@@ -1,6 +1,6 @@
 "use client";
 import { useRef, useState, useTransition } from "react";
-import { InlineLoading, PendingButtonContent } from "@/components/loading-state";
+import { PendingButtonContent } from "@/components/loading-state";
 import { T, type TranslationKey } from "@/lib/i18n";
 import type { ParticipationStatus } from "@/lib/my-tests";
 import type { ParticipationFeedback } from "@/lib/participation-feedback";
@@ -53,7 +53,6 @@ export function ParticipationFeedbackEditor({ participationId, status, feedback,
         <button className="button button-primary button-small" type="submit" disabled={pending || !text.trim()}><PendingButtonContent pending={pending} label="tests.saving" announce={false}><T id="feedback.save" /></PendingButtonContent></button>
       </div>
     </form>
-    {pending && <InlineLoading label="tests.saving" />}
     {result.error && <p role="alert"><T id={errors[result.error]} /></p>}
   </ParticipationDialog>;
 }
