@@ -1,5 +1,6 @@
 "use client";
 
+import { countryName } from "@/lib/countries";
 import { CampaignCard } from "@/components/ui";
 import { useI18n, type TranslationKey } from "@/lib/i18n";
 import type { Campaign, CampaignStatus } from "@/lib/campaign-card-types";
@@ -28,7 +29,7 @@ export function DashboardCampaignCard({
 }: {
   campaign: DashboardData["campaigns_for_you"][number];
 }) {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const platformKey: TranslationKey =
     campaign.platform === "android" ? "explore.android" : "explore.ios";
   const platform = t(platformKey);
@@ -41,7 +42,7 @@ export function DashboardCampaignCard({
     platform,
     countries: campaign.all_countries
       ? [t("dashboard.allCountries")]
-      : campaign.country_codes,
+      : campaign.country_codes.length > 3 ? [t("countries.count", { count: campaign.country_codes.length })] : campaign.country_codes.map((code) => countryName(code, language)),
     minVersion: "",
     duration: t("dashboard.durationDays", { count: campaign.duration_days }),
     target: campaign.target_testers,

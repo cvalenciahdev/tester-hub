@@ -1,0 +1,15 @@
+.picker { position: relative; min-width: 0; }
+.native { position: absolute; width: 1px !important; height: 1px; min-height: 1px !important; padding: 0 !important; opacity: 0; pointer-events: none; }
+.trigger { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 42px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 7px; color: var(--text); background: var(--surface); font: inherit; text-align: left; cursor: pointer; }
+.trigger span { min-width: 0; overflow-wrap: anywhere; }
+.trigger svg { flex-shrink: 0; }
+.trigger:disabled, .chip button:disabled { opacity: .65; cursor: default; }
+.dropdown { position: absolute; z-index: 20; top: 100%; left: 0; width: 100%; min-width: 0; padding: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-raised); box-shadow: var(--shadow); }
+.dropdown input { width: 100%; min-width: 0; }
+.options { max-height: min(240px, 35vh); overflow-y: auto; margin-top: 6px; }
+.options button { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; min-height: 38px; padding: 8px; border: 0; border-radius: 5px; background: transparent; color: var(--text); font: inherit; text-align: left; cursor: pointer; overflow-wrap: anywhere; }
+.options button:hover, .options button[aria-selected="true"] { background: var(--surface-soft); }
+.close { margin-top: 6px; padding: 6px 8px; border: 0; background: transparent; color: var(--text); font: inherit; cursor: pointer; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
+.chip { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; padding: 5px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface-soft); overflow-wrap: anywhere; }
+.chip button { display: flex; flex-shrink: 0; align-items: center; justify-content: center; min-width: 24px; min-height: 24px; padding: 2px; border: 0; background: transparent; color: var(--text); cursor: pointer; }

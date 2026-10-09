@@ -1,8 +1,9 @@
 "use client";
 import Link from "next/link";
 import { PendingButtonContent } from "@/components/loading-state";
+import { CountryMultiSelect } from "@/components/country-select";
 import { useActionState, useRef, useState, type ChangeEvent } from "react";
-import { T, type TranslationKey } from "@/lib/i18n";
+import { T, useI18n, type TranslationKey } from "@/lib/i18n";
 import type { OwnCampaign } from "@/lib/own-campaigns";
 import type { CampaignError, CampaignResult } from "@/lib/campaign-input";
 import { createCampaign, mutateCampaign } from "./actions";
@@ -15,14 +16,15 @@ const errors: Record<CampaignError, TranslationKey> = {
   platform: "roundForm.errorPlatform", failed: "roundForm.errorFailed",
 };
 export function CampaignForm({ appId, campaign }: { appId: string; campaign?: OwnCampaign }) {
+  const { t } = useI18n();
   const inFlight = useRef(false);
   const [allCountries, setAllCountries] = useState(campaign?.all_countries ?? false);
+  const [countries, setCountries] = useState(campaign?.country_codes ?? []);
   const [submittingOperation, setSubmittingOperation] = useState("save");
   // Keep values controlled so a failed save or publication never discards the user's input.
   const [formValues, setFormValues] = useState<Record<string, string>>({
     platform: campaign?.platform ?? "android",
     target_testers: String(campaign?.target_testers ?? 1),
-    country_codes: campaign?.country_codes.join(", ") ?? "",
     min_os_major: campaign?.min_os_major == null ? "" : String(campaign.min_os_major),
     min_os_minor: campaign?.min_os_minor == null ? "" : String(campaign.min_os_minor),
     duration_days: String(campaign?.duration_days ?? 14),
@@ -64,8 +66,14 @@ export function CampaignForm({ appId, campaign }: { appId: string; campaign?: Ow
         <section className="form-section">
           <div className="form-section-heading"><div><h2><T id="campaignForm.requirements" /></h2></div></div>
           <div className="form-grid">
-            <label className="field field-full"><span><input type="checkbox" name="all_countries" checked={allCountries} onChange={(event) => setAllCountries(event.target.checked)} disabled={disabled || locked} /> <T id="dashboard.allCountries" /></span></label>
-            <label className={`field field-full ${styles.countriesField}`}><span><T id="common.countries" /></span><input name="country_codes" {...fieldValue("country_codes", campaign?.country_codes.join(", ") ?? "")} required={!allCountries} disabled={disabled || locked || allCountries} placeholder="ES, MX" /><small><T id="roundForm.countryHelp" /></small></label>
+            <fieldset className="field field-full country-availability" disabled={disabled || locked}>
+              <legend><T id="countries.availability" /></legend>
+              <div>
+                <label><input type="radio" name="all_countries" value="on" checked={allCountries} onChange={() => setAllCountries(true)} /><T id="dashboard.allCountries" /></label>
+                <label><input type="radio" name="all_countries" value="off" checked={!allCountries} onChange={() => setAllCountries(false)} /><T id="countries.specific" /></label>
+              </div>
+            </fieldset>
+            {!allCountries && <div className="field-full"><CountryMultiSelect name="country_codes" label={t("common.countries")} values={countries} onChange={setCountries} required disabled={disabled || locked} /></div>}
           </div>
           <div className={`form-grid ${styles.requirementsGrid}`}>
             <label className="field"><span><T id="roundForm.osMajor" /></span><input name="min_os_major" type="number" min={0} max={32767} step={1} {...fieldValue("min_os_major", campaign?.min_os_major ?? "")} disabled={disabled || locked} /></label>

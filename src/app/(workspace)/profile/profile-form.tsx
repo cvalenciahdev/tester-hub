@@ -1,6 +1,7 @@
 "use client";
 import { useActionState, useRef, useState } from "react";
 import { PendingButtonContent } from "@/components/loading-state";
+import { CountrySelect } from "@/components/country-select";
 import { formatKnownOsVersion, unknownDevice } from "@/lib/device-os";
 import { LockKeyhole, Mail, Smartphone } from "lucide-react";
 import { CurrentLanguageName, T, type TranslationKey, useI18n } from "@/lib/i18n";
@@ -16,7 +17,7 @@ const errors: Record<ProfileError, TranslationKey> = {
 };
 const intents = { tester: "onboarding.tryApps", developer: "onboarding.findTesters", both: "onboarding.both" } as const;
 export function ProfileForm({ data }: { data: ProfileData }) {
-  const { language } = useI18n();
+  const { language, t } = useI18n();
   const inFlight = useRef(false), newDevice = useRef(0);
   const [devices, setDevices] = useState<DeviceDraft[]>(data.devices.map((device) => ({ ...device, key: device.id })));
   const [editor, setEditor] = useState<string | null>(null);
@@ -55,7 +56,7 @@ export function ProfileForm({ data }: { data: ProfileData }) {
             <div className="profile-identity"><span className="profile-big-avatar">{initials || "—"}</span><div><strong>{name.trim() || "—"}</strong><span><T id="profile.created" /> <time dateTime={data.profile.created_at}>{new Intl.DateTimeFormat(language === "es" ? "es-MX" : "en-US", { dateStyle: "medium", timeZone: "America/Cancun" }).format(new Date(data.profile.created_at))}</time></span></div></div>
             <div className="profile-fields">
               <label className="field"><span><T id="profile.name" /></span><input name="display_name" value={name} onChange={(event) => setName(event.target.value)} disabled={pending} /></label>
-              <label className="field"><span><T id="profile.country" /></span><input name="country_code" value={country} onChange={(event) => setCountry(event.target.value)} required minLength={2} maxLength={2} pattern="[A-Za-z]{2}" autoCapitalize="characters" disabled={pending} /></label>
+              <CountrySelect name="country_code" label={t("profile.country")} value={country} onChange={setCountry} required disabled={pending} />
               <label className="field"><span><T id="profile.intent" /></span><select name="initial_intent" value={intent} onChange={(event) => setIntent(event.target.value as typeof intent)} required disabled={pending}><option value="" disabled>—</option>{Object.entries(intents).map(([value, label]) => <option key={value} value={value}><T id={label} /></option>)}</select></label>
               <div><small><T id="profile.language" /></small><strong><CurrentLanguageName /></strong></div>
             </div>

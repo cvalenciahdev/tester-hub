@@ -1,3 +1,4 @@
+import { CountryAvailability } from "@/components/country-display";
 import { ArrowUpRight, Clock3, MapPin, Users } from "lucide-react";
 import Link from "next/link";
 import { T } from "@/lib/i18n";
@@ -22,7 +23,7 @@ export function ExploreCampaignCard({ campaign, query }: { campaign: ExploreCamp
       <p className="campaign-card-description">{campaign.app_description ?? ""}</p>
       <div className="campaign-facts">
         <span><T id={platformKey} /></span>
-        <span><MapPin size={14} />{campaign.all_countries ? <T id="dashboard.allCountries" /> : campaign.country_codes.join(", ")}</span>
+        <span><MapPin size={14} />{<CountryAvailability all={campaign.all_countries} codes={campaign.country_codes} />}</span>
         <span><Clock3 size={14} /><T id="dashboard.durationDays" values={{ count: campaign.duration_days }} /></span>
       </div>
       <div className="campaign-progress-label">

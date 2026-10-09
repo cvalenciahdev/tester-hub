@@ -1,3 +1,4 @@
+import { CountryAvailability } from "@/components/country-display";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Check, Clock3, MapPin, ShieldCheck, Smartphone, Users } from "lucide-react";
@@ -31,7 +32,7 @@ export default async function CampaignDetailPage({ params, searchParams }: PageP
             <p className="detail-description">{campaign.app_description ?? ""}</p>
             <div className="detail-facts">
               <div><span className="fact-icon"><Smartphone size={17} /></span><small><T id="common.platform" /></small><strong><T id={platformKey} /></strong></div>
-              <div><span className="fact-icon"><MapPin size={17} /></span><small><T id="common.countries" /></small><strong>{campaign.all_countries ? <T id="dashboard.allCountries" /> : campaign.country_codes.join(", ")}</strong></div>
+              <div><span className="fact-icon"><MapPin size={17} /></span><small><T id="common.countries" /></small><strong>{<CountryAvailability all={campaign.all_countries} codes={campaign.country_codes} />}</strong></div>
               <div><span className="fact-icon"><Clock3 size={17} /></span><small><T id="common.duration" /></small><strong><T id="dashboard.durationDays" values={{ count: campaign.duration_days }} /></strong></div>
               {minVersion && <div><span className="fact-icon"><ShieldCheck size={17} /></span><small><T id="common.minimumVersion" /></small><strong>{minVersion}</strong></div>}
             </div>

@@ -6,7 +6,7 @@ import { getExploreCampaignDetail, isCampaignId } from "@/lib/explore";
 import { createClient } from "@/lib/supabase/server";
 
 export type JoinResult = {
-  error?: "ALREADY_JOINED" | "NO_AVAILABLE_SLOTS" | "OWNER_CANNOT_JOIN" | "TESTING_EMAIL_REQUIRED" | "CAMPAIGN_NOT_OPEN" | "CAMPAIGN_NOT_AVAILABLE" | "JOIN_FAILED";
+  error?: "ALREADY_JOINED" | "NO_AVAILABLE_SLOTS" | "OWNER_CANNOT_JOIN" | "TESTING_EMAIL_REQUIRED" | "CAMPAIGN_NOT_OPEN" | "CAMPAIGN_NOT_AVAILABLE" | "COUNTRY_NOT_ELIGIBLE" | "JOIN_FAILED";
 };
 
 export async function joinExploreCampaign(campaignId: string): Promise<JoinResult> {
@@ -14,7 +14,7 @@ export async function joinExploreCampaign(campaignId: string): Promise<JoinResul
   try {
     const supabase = await createClient();
     if (!await getCurrentUser(supabase)) return { error: "JOIN_FAILED" };
-    // join_campaign does not enforce country discovery. Authorize even direct POSTs here.
+    // Discovery gives early feedback; join_campaign revalidates country inside its transaction.
     const campaign = await getExploreCampaignDetail(campaignId, supabase);
     if (!campaign) return { error: "CAMPAIGN_NOT_AVAILABLE" };
     if (campaign.own_participation) {
@@ -30,7 +30,7 @@ export async function joinExploreCampaign(campaignId: string): Promise<JoinResul
     if (error) {
       const code = error.message;
       if (code === "ALREADY_JOINED" || code === "NO_AVAILABLE_SLOTS" || code === "OWNER_CANNOT_JOIN" ||
-          code === "TESTING_EMAIL_REQUIRED" || code === "CAMPAIGN_NOT_OPEN") {
+          code === "TESTING_EMAIL_REQUIRED" || code === "CAMPAIGN_NOT_OPEN" || code === "COUNTRY_NOT_ELIGIBLE") {
         revalidatePath(`/explore/${campaignId}`);
         return { error: code };
       }

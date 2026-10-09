@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { knownOsMajorVersion, unknownDevice } from "@/lib/device-os";
 import { getCurrentUser, getOnboardingStatus } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { isCountryCode } from "@/lib/countries";
 
 export type OnboardingFormState = {
   error?: "invalidCountry" | "invalidEmail" | "invalidIntent" | "invalidDevice" | "saveFailed";
@@ -31,7 +32,7 @@ export async function completeOnboarding(
   }
 
   const countryCode = readString(formData, "country_code").toUpperCase();
-  if (!/^[A-Z]{2}$/.test(countryCode)) {
+  if (!isCountryCode(countryCode)) {
     return { error: "invalidCountry" };
   }
 

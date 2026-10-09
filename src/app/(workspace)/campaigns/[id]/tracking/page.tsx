@@ -1,3 +1,4 @@
+import { CountryName } from "@/components/country-display";
 import { notFound } from "next/navigation";
 import { UserRoundCheck } from "lucide-react";
 import { Badge, EmptyHint } from "@/components/ui";
@@ -40,7 +41,7 @@ export default async function TrackingPage({ params }: PageProps<"/campaigns/[id
           const avatar = row.display_name?.trim().split(/\s+/).slice(0, 2).map((word) => word[0]).join("").toUpperCase() || "—";
           return <tr key={row.participation_id}>
             <td><div className="table-app"><span className="avatar tester-avatar">{avatar}</span><span><strong>{name}</strong><small>{row.testing_email_snapshot}</small></span></div></td>
-            <td className="muted-cell">{row.country_code ?? "—"}</td>
+            <td className="muted-cell"><CountryName code={row.country_code} /></td>
             <td className="muted-cell"><TrackingDate value={row.joined_at} /></td>
             <td><Badge status={participationBadges[row.participation_status]} /></td>
             <td><ParticipationDetail participation={row} /></td>

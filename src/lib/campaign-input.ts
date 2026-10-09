@@ -1,3 +1,5 @@
+import { isCountryCode } from "@/lib/countries";
+
 export type CampaignError = "auth" | "unavailable" | "archived" | "state" | "locked" | "target" | "duration" | "os" | "countries" | "platform" | "failed";
 export type CampaignResult = { error?: CampaignError; saved?: boolean; createdCampaign?: { id: string; confirmedDraft: boolean } };
 export function campaignError(error: { message?: string; code?: string }): CampaignError {
@@ -33,9 +35,10 @@ export function campaignInput(form: FormData, structural: boolean) {
   const minor = integer(form.get("min_os_minor"), 0, 32767, true);
   if (major === undefined || minor === undefined || (minor !== null && major === null)) return { error: "os" as const };
   const all = form.get("all_countries") === "on";
-  const raw = form.get("country_codes");
-  const countries = all ? [] : typeof raw === "string" ? [...new Set(raw.split(/[\s,;]+/).filter(Boolean).map((code) => code.toUpperCase()))] : [];
-  if ((!all && countries.length === 0) || countries.some((code) => !/^[A-Z]{2}$/.test(code))) return { error: "countries" as const };
+  const raw = form.getAll("country_codes");
+  if (!all && raw.some((value) => typeof value !== "string")) return { error: "countries" as const };
+  const countries = all ? [] : [...new Set((raw as string[]).flatMap((value) => value.split(/[\s,;]+/).filter(Boolean).map((code) => code.toUpperCase())))];
+  if ((!all && countries.length === 0) || countries.some((code) => !isCountryCode(code))) return { error: "countries" as const };
   return { fields: { ...fields, p_platform: platform, p_duration_days: duration as number, p_all_countries: all,
     p_min_os_major: major, p_min_os_minor: minor, p_country_codes: countries } };
 }

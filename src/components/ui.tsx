@@ -107,7 +107,7 @@ export function CampaignCard({ campaign }: { campaign: Campaign }) {
       <p className="campaign-card-description">{campaign.description}</p>
       <div className="campaign-facts">
         <span>{campaign.platform}</span>
-        <span><MapPin size={14} />{campaign.countries.slice(0, 2).join(", ")}</span>
+        <span><MapPin size={14} />{campaign.countries.join(", ")}</span>
         <span><Clock3 size={14} />{campaign.duration}</span>
       </div>
       <div className="campaign-progress-label">

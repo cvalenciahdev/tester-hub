@@ -1,4 +1,5 @@
 import "server-only";
+import { isCountryCode } from "@/lib/countries";
 
 import type { User } from "@supabase/supabase-js";
 import type { createClient } from "@/lib/supabase/server";
@@ -53,7 +54,7 @@ export async function getOnboardingStatus(
 
   return {
     complete:
-      profile.country_code !== null &&
+      isCountryCode(profile.country_code) &&
       profile.testing_email !== null &&
       profile.testing_email.trim().length > 0 &&
       profile.initial_intent !== null &&

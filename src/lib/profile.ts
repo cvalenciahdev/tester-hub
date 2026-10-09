@@ -1,4 +1,5 @@
 import "server-only";
+import { isCountryCode } from "@/lib/countries";
 import { getCurrentUser, type OnboardingProfile } from "@/lib/auth";
 import { isDeviceId, validEmail, type ProfileDevice } from "@/lib/profile-input";
 import { createClient } from "@/lib/supabase/server";
@@ -29,8 +30,8 @@ export async function getProfileData(): Promise<ProfileData | null> {
   if (!Number.isFinite(Date.parse(profile.created_at)) ||
       !["tester", "developer", "both", null].includes(profile.initial_intent) ||
       [profile.display_name, profile.country_code, profile.testing_email].some((value) => value !== null && typeof value !== "string")) throw new Error("Invalid profile response.");
-  const complete = profile.country_code !== null && profile.testing_email !== null && profile.testing_email.trim().length > 0 && profile.initial_intent !== null && devices.length > 0;
-  const anomalous = !complete || !/^[A-Z]{2}$/.test(profile.country_code ?? "") || !validEmail(profile.testing_email ?? "") ||
+  const complete = isCountryCode(profile.country_code) && profile.testing_email !== null && profile.testing_email.trim().length > 0 && profile.initial_intent !== null && devices.length > 0;
+  const anomalous = !complete || !isCountryCode(profile.country_code) || !validEmail(profile.testing_email ?? "") ||
     devices.length > 2 || new Set(devices.map((device) => device.platform)).size !== devices.length;
   return { profile: { display_name: profile.display_name, country_code: profile.country_code, testing_email: profile.testing_email,
     initial_intent: profile.initial_intent, created_at: profile.created_at }, devices, complete, anomalous };

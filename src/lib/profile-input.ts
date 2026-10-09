@@ -1,4 +1,5 @@
 import { UNKNOWN_OS_MAJOR_VERSION, knownOsMajorVersion } from "@/lib/device-os";
+import { isCountryCode } from "@/lib/countries";
 
 export type ProfileDevice = { id?: string; platform: "android" | "ios"; os_major: number; os_minor: number | null; model: string | null };
 export type ProfileInput = { display_name: string | null; country_code: string; testing_email: string; initial_intent: "tester" | "developer" | "both"; devices: ProfileDevice[] };
@@ -10,7 +11,7 @@ function version(value: unknown): value is number { return typeof value === "num
 export function parseProfileInput(form: FormData): { input?: ProfileInput; error?: ProfileError } {
   const string = (key: string) => typeof form.get(key) === "string" ? (form.get(key) as string).trim() : "";
   const country = string("country_code").toUpperCase(), email = string("testing_email"), intent = string("initial_intent");
-  if (!/^[A-Z]{2}$/.test(country)) return { error: "country" };
+  if (!isCountryCode(country)) return { error: "country" };
   if (!validEmail(email)) return { error: "email" };
   if (intent !== "tester" && intent !== "developer" && intent !== "both") return { error: "intent" };
   let rows: unknown;

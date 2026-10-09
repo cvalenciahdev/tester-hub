@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { PendingButtonContent } from "@/components/loading-state";
+import { CountrySelect } from "@/components/country-select";
 import { ArrowRight } from "lucide-react";
 import { completeOnboarding, type OnboardingFormState } from "@/app/onboarding/actions";
 import { T, useI18n } from "@/lib/i18n";
@@ -30,6 +31,7 @@ export function OnboardingForm({
 }) {
   const [state, action, pending] = useActionState(completeOnboarding, initialState);
   const { t } = useI18n();
+  const [country, setCountry] = useState(profile?.country_code ?? "");
   const hasAndroid = devices.some((device) => device.platform === "android");
   const hasIos = devices.some((device) => device.platform === "ios");
   const [platform, setPlatform] = useState(
@@ -39,22 +41,7 @@ export function OnboardingForm({
   return (
     <form action={action}>
       <div className="form-grid">
-        <label className="field">
-          <span><T id="onboarding.country" /> <b>*</b></span>
-          <input
-            autoCapitalize="characters"
-            autoComplete="country"
-            defaultValue={profile?.country_code ?? ""}
-            maxLength={2}
-            minLength={2}
-            name="country_code"
-            pattern="[A-Za-z]{2}"
-            placeholder={t("onboarding.countryPlaceholder")}
-            required
-            type="text"
-          />
-          <small><T id="onboarding.countryHelp" /></small>
-        </label>
+        <CountrySelect name="country_code" label={t("onboarding.country")} value={country} onChange={setCountry} required disabled={pending} />
         <label className="field">
           <span><T id="onboarding.testingEmail" /> <b>*</b></span>
           <input

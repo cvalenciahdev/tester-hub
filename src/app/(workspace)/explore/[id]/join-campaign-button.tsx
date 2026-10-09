@@ -17,6 +17,7 @@ const joinErrors: Record<NonNullable<JoinResult["error"]>, TranslationKey> = {
   OWNER_CANNOT_JOIN: "detail.ownerCannotJoin", TESTING_EMAIL_REQUIRED: "detail.testingEmailRequired",
   CAMPAIGN_NOT_OPEN: "detail.campaignNotOpen", CAMPAIGN_NOT_AVAILABLE: "detail.notAvailable",
   JOIN_FAILED: "detail.joinFailed",
+  COUNTRY_NOT_ELIGIBLE: "countries.notEligible",
 };
 
 export function JoinCampaignButton({ campaignId, availableSlots, participation }: {
