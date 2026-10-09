@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  ChevronDown,
   ClipboardList,
   Compass,
   Grid2X2,
@@ -36,9 +35,7 @@ function titleForPath(pathname: string, t: (key: TranslationKey) => string) {
   if (pathname.startsWith("/my-tests")) return t("common.myTests");
   if (pathname.startsWith("/apps")) return t("common.myApps");
   if (pathname.includes("/tracking")) return t("common.campaignTracking");
-  if (pathname.startsWith("/campaigns/new")) return t("common.newCampaign");
   if (pathname.startsWith("/campaigns/")) return t("common.editCampaign");
-  if (pathname.startsWith("/campaigns")) return t("common.myCampaigns");
   if (pathname.startsWith("/profile")) return t("common.profile");
   return t("common.dashboard");
 }
@@ -75,11 +72,6 @@ export function AppShell({
           <span className="brand-symbol"><Grid2X2 size={18} strokeWidth={2.4} /></span>
           <span>tester<span className="brand-light">hub</span></span>
         </Link>
-        <div className="workspace-switcher">
-          <span className="workspace-avatar">TH</span>
-          <span className="workspace-name"><strong>{t("common.workspace")}</strong><small>{t("common.personal")}</small></span>
-          <ChevronDown size={15} />
-        </div>
         <div className="nav-label">{t("common.mainMenu")}</div>
         <nav className="side-nav" aria-label={t("common.mainMenu")}>
           {navigation.map(({ label, href, icon: Icon }) => {

@@ -2,7 +2,7 @@
 
 import { CampaignCard } from "@/components/ui";
 import { useI18n, type TranslationKey } from "@/lib/i18n";
-import type { Campaign, CampaignStatus } from "@/lib/mock-data";
+import type { Campaign, CampaignStatus } from "@/lib/campaign-card-types";
 import type { DashboardData } from "@/lib/dashboard";
 
 const campaignStatuses: Record<

@@ -1,8 +1,5 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
 import { Badge, PageHeading } from "@/components/ui";
-import { T } from "@/lib/i18n";
 import { getOwnApp } from "@/lib/apps";
 import { AppForm } from "../app-form";
 import { AppArchivedAt } from "../apps-controls";

@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import type { ComponentType } from "react";
 import Link from "next/link";
 import { ArrowUpRight, Clock3, MapPin, Users } from "lucide-react";
-import type { Campaign, CampaignStatus, ParticipationStatus } from "@/lib/mock-data";
+import type { Campaign, CampaignStatus, ParticipationStatus } from "@/lib/campaign-card-types";
 import { T, type TranslationKey } from "@/lib/i18n";
 
 type BadgeStatus =

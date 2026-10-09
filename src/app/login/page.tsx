@@ -71,17 +71,6 @@ export default async function LoginPage({
           </span>
         </div>
 
-        <p className="auth-terms">
-          <T id="auth.termsPrefix" />{" "}
-          <a href="#terms">
-            <T id="auth.terms" />
-          </a>{" "}
-          <T id="auth.and" />{" "}
-          <a href="#privacy">
-            <T id="auth.privacy" />
-          </a>
-          .
-        </p>
       </div>
     </main>
   );
