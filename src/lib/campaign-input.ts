@@ -1,6 +1,7 @@
 import { isCountryCode } from "@/lib/countries";
+import { parseDuration } from "@/lib/campaign-duration";
 
-export type CampaignError = "auth" | "unavailable" | "archived" | "state" | "locked" | "target" | "duration" | "os" | "countries" | "platform" | "failed";
+export type CampaignError = "auth" | "unavailable" | "archived" | "state" | "locked" | "target" | "duration" | "durationRange" | "iosDuration" | "os" | "countries" | "platform" | "failed";
 export type CampaignResult = { error?: CampaignError; saved?: boolean; createdCampaign?: { id: string; confirmedDraft: boolean } };
 export function campaignError(error: { message?: string; code?: string }): CampaignError {
   const known: Record<string, CampaignError> = {
@@ -8,6 +9,8 @@ export function campaignError(error: { message?: string; code?: string }): Campa
     NOT_APP_OWNER: "unavailable", NOT_CAMPAIGN_OWNER: "unavailable", APP_ARCHIVED: "archived",
     INVALID_CAMPAIGN_STATE: "state", STRUCTURAL_FIELDS_LOCKED: "locked", TARGET_BELOW_COVERED_TESTERS: "target",
     INVALID_TARGET_TESTERS: "target", INVALID_DURATION_DAYS: "duration", INVALID_OS_VERSION: "os",
+    IOS_DURATION_EXCEEDED: "iosDuration",
+    DURATION_OUT_OF_RANGE: "durationRange",
     INVALID_COUNTRY_CODE: "countries", CAMPAIGN_COUNTRIES_REQUIRED: "countries",
   };
   return known[error.message ?? ""] ?? "failed";
@@ -29,8 +32,9 @@ export function campaignInput(form: FormData, structural: boolean) {
   if (!structural) return { fields };
   const platform = form.get("platform");
   if (platform !== "android" && platform !== "ios") return { error: "platform" as const };
-  const duration = integer(form.get("duration_days"), 1, 2147483647);
-  if (duration === undefined) return { error: "duration" as const };
+  const duration = parseDuration(form.get("duration_days"));
+  if (duration === null) return { error: "duration" as const };
+  if (platform === "ios" && duration > 90) return { error: "iosDuration" as const };
   const major = integer(form.get("min_os_major"), 0, 32767, true);
   const minor = integer(form.get("min_os_minor"), 0, 32767, true);
   if (major === undefined || minor === undefined || (minor !== null && major === null)) return { error: "os" as const };

@@ -2,6 +2,8 @@
 import Link from "next/link";
 import { PendingButtonContent } from "@/components/loading-state";
 import { CountryMultiSelect } from "@/components/country-select";
+import { CampaignDuration } from "@/components/campaign-duration";
+import { parseDuration } from "@/lib/campaign-duration";
 import { useActionState, useRef, useState, type ChangeEvent } from "react";
 import { T, useI18n, type TranslationKey } from "@/lib/i18n";
 import type { OwnCampaign } from "@/lib/own-campaigns";
@@ -13,6 +15,8 @@ const errors: Record<CampaignError, TranslationKey> = {
   auth: "roundForm.errorAuth", unavailable: "roundForm.errorUnavailable", archived: "roundForm.errorArchived",
   state: "roundForm.errorState", locked: "roundForm.errorLocked", target: "roundForm.errorTarget",
   duration: "roundForm.errorDuration", os: "roundForm.errorOs", countries: "roundForm.errorCountries",
+  iosDuration: "duration.iosExceeded",
+  durationRange: "duration.outOfRange",
   platform: "roundForm.errorPlatform", failed: "roundForm.errorFailed",
 };
 export function CampaignForm({ appId, campaign }: { appId: string; campaign?: OwnCampaign }) {
@@ -47,6 +51,11 @@ export function CampaignForm({ appId, campaign }: { appId: string; campaign?: Ow
   const creationFinished = !campaign && !!state.createdCampaign;
   const disabled = pending || readOnly || creationFinished;
   function submit(event: React.FormEvent<HTMLFormElement>) {
+    const operation = (event.nativeEvent as SubmitEvent).submitter?.getAttribute("value");
+    if (!locked && operation !== "cancel" && (parseDuration(formValues.duration_days) === null ||
+      (formValues.platform === "ios" && Number(formValues.duration_days) > 90))) {
+      event.preventDefault(); return;
+    }
     if (pending || inFlight.current || creationFinished) event.preventDefault();
     else {
       inFlight.current = true;
@@ -78,7 +87,8 @@ export function CampaignForm({ appId, campaign }: { appId: string; campaign?: Ow
           <div className={`form-grid ${styles.requirementsGrid}`}>
             <label className="field"><span><T id="roundForm.osMajor" /></span><input name="min_os_major" type="number" min={0} max={32767} step={1} {...fieldValue("min_os_major", campaign?.min_os_major ?? "")} disabled={disabled || locked} /></label>
             <label className="field"><span><T id="roundForm.osMinor" /></span><input name="min_os_minor" type="number" min={0} max={32767} step={1} {...fieldValue("min_os_minor", campaign?.min_os_minor ?? "")} disabled={disabled || locked} /></label>
-            <label className="field"><span><T id="common.duration" /> (<T id="campaignForm.days" />)</span><input name="duration_days" type="number" min={1} max={2147483647} step={1} required {...fieldValue("duration_days", campaign?.duration_days ?? 14)} disabled={disabled || locked} /></label>
+            <CampaignDuration platform={formValues.platform} value={formValues.duration_days}
+              onChange={(value) => setFormValues((current) => ({ ...current, duration_days: value }))} disabled={disabled || locked} locked={locked} />
           </div>
           <p className={styles.versionHelp}><T id="roundForm.osHelp" /></p>
           {locked && <p className="muted-cell"><T id="roundForm.locked" /></p>}

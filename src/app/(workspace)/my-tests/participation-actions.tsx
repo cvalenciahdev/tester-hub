@@ -16,6 +16,7 @@ const errorKeys: Record<NonNullable<MutationResult["error"]>, TranslationKey> = 
   INVALID_PARTICIPATION_STATE: "tests.errorState", TEST_PERIOD_NOT_FINISHED: "tests.errorPeriod",
   REASON_REQUIRED: "tests.errorReason", NOT_AUTHENTICATED: "tests.errorAuth",
   NOT_PARTICIPATION_TESTER: "tests.errorOwnership", ACTION_FAILED: "tests.errorAction",
+  DURATION_OUT_OF_RANGE: "duration.outOfRange",
   FEEDBACK_REQUIRED: "feedback.beforeComplete",
 };
 const statuses = { waiting_access: "Waiting access", access_enabled: "Access enabled", active: "Active", completed: "Completed", incompatible: "Incompatible", abandoned: "Abandoned", cancelled: "Cancelled" } as const;
