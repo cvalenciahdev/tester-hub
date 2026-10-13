@@ -49,16 +49,8 @@
 }
 
 .editLayout .generalGrid {
-  grid-template-columns: minmax(0, 1.4fr) minmax(180px, 0.8fr);
-}
-
-.editLayout .generalGrid > :nth-child(2) {
-  max-width: 270px;
-}
-
-.editLayout .requirementsGrid {
-  grid-template-columns: repeat(3, minmax(0, 160px));
-  margin-top: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
 }
 
 .countriesField,
@@ -93,13 +85,6 @@
   max-width: 100%;
 }
 
-.versionHelp {
-  margin: 8px 0 0;
-  color: var(--muted);
-  font-size: 9px;
-  line-height: 1.5;
-}
-
 .editLayout .saveActions > :first-child {
   margin-right: 0;
 }
@@ -128,7 +113,7 @@
 }
 
 @media (max-width: 900px) {
-  .editLayout .requirementsGrid {
+  .editLayout .generalGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -138,16 +123,8 @@
     padding: 15px;
   }
 
-  .editLayout .generalGrid,
-  .editLayout .requirementsGrid {
+  .editLayout .generalGrid {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .editLayout .generalGrid > :nth-child(2) {
-    max-width: none;
-  }
-
-  .editLayout .requirementsGrid {
-    margin-top: 11px;
-  }
 }

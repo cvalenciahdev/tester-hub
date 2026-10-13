@@ -35,14 +35,11 @@ export function campaignInput(form: FormData, structural: boolean) {
   const duration = parseDuration(form.get("duration_days"));
   if (duration === null) return { error: "duration" as const };
   if (platform === "ios" && duration > 90) return { error: "iosDuration" as const };
-  const major = integer(form.get("min_os_major"), 0, 32767, true);
-  const minor = integer(form.get("min_os_minor"), 0, 32767, true);
-  if (major === undefined || minor === undefined || (minor !== null && major === null)) return { error: "os" as const };
   const all = form.get("all_countries") === "on";
   const raw = form.getAll("country_codes");
   if (!all && raw.some((value) => typeof value !== "string")) return { error: "countries" as const };
   const countries = all ? [] : [...new Set((raw as string[]).flatMap((value) => value.split(/[\s,;]+/).filter(Boolean).map((code) => code.toUpperCase())))];
   if ((!all && countries.length === 0) || countries.some((code) => !isCountryCode(code))) return { error: "countries" as const };
   return { fields: { ...fields, p_platform: platform, p_duration_days: duration as number, p_all_countries: all,
-    p_min_os_major: major, p_min_os_minor: minor, p_country_codes: countries } };
+    p_country_codes: countries } };
 }

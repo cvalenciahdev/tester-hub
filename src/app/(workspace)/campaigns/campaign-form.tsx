@@ -29,8 +29,6 @@ export function CampaignForm({ appId, campaign }: { appId: string; campaign?: Ow
   const [formValues, setFormValues] = useState<Record<string, string>>({
     platform: campaign?.platform ?? "android",
     target_testers: String(campaign?.target_testers ?? 1),
-    min_os_major: campaign?.min_os_major == null ? "" : String(campaign.min_os_major),
-    min_os_minor: campaign?.min_os_minor == null ? "" : String(campaign.min_os_minor),
     duration_days: String(campaign?.duration_days ?? 14),
     store_url: campaign?.store_url ?? "",
     instructions: campaign?.instructions ?? "",
@@ -70,6 +68,8 @@ export function CampaignForm({ appId, campaign }: { appId: string; campaign?: Ow
           <div className={`form-grid ${styles.generalGrid}`}>
             <label className="field"><span><T id="campaignForm.platform" /></span><select name="platform" {...fieldValue("platform", campaign?.platform ?? "android")} disabled={disabled || locked}><option value="android">Android</option><option value="ios">iOS</option></select></label>
             <label className="field"><span><T id="campaignForm.targetTesters" /></span><input name="target_testers" type="number" min={Math.max(1, campaign?.covered_testers ?? 0)} max={2147483647} step={1} required {...fieldValue("target_testers", campaign?.target_testers ?? 1)} disabled={disabled} /></label>
+            <CampaignDuration platform={formValues.platform} value={formValues.duration_days}
+              onChange={(value) => setFormValues((current) => ({ ...current, duration_days: value }))} disabled={disabled || locked} locked={locked} />
           </div>
         </section>
         <section className="form-section">
@@ -84,13 +84,6 @@ export function CampaignForm({ appId, campaign }: { appId: string; campaign?: Ow
             </fieldset>
             {!allCountries && <div className="field-full"><CountryMultiSelect name="country_codes" label={t("common.countries")} values={countries} onChange={setCountries} required disabled={disabled || locked} /></div>}
           </div>
-          <div className={`form-grid ${styles.requirementsGrid}`}>
-            <label className="field"><span><T id="roundForm.osMajor" /></span><input name="min_os_major" type="number" min={0} max={32767} step={1} {...fieldValue("min_os_major", campaign?.min_os_major ?? "")} disabled={disabled || locked} /></label>
-            <label className="field"><span><T id="roundForm.osMinor" /></span><input name="min_os_minor" type="number" min={0} max={32767} step={1} {...fieldValue("min_os_minor", campaign?.min_os_minor ?? "")} disabled={disabled || locked} /></label>
-            <CampaignDuration platform={formValues.platform} value={formValues.duration_days}
-              onChange={(value) => setFormValues((current) => ({ ...current, duration_days: value }))} disabled={disabled || locked} locked={locked} />
-          </div>
-          <p className={styles.versionHelp}><T id="roundForm.osHelp" /></p>
           {locked && <p className="muted-cell"><T id="roundForm.locked" /></p>}
         </section>
         <section className="form-section">
