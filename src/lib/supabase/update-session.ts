@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
+import { shouldDeferAuthError } from "@/lib/supabase/auth-errors";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function updateSession(request: NextRequest) {
@@ -32,7 +33,7 @@ export async function updateSession(request: NextRequest) {
 
   const { error } = await supabase.auth.getClaims();
 
-  if (error) {
+  if (error && !shouldDeferAuthError(error)) {
     throw error;
   }
 

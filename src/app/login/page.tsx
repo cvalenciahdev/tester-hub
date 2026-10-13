@@ -1,8 +1,11 @@
 import { redirect } from "next/navigation";
 import { Check, FlaskConical, UsersRound } from "lucide-react";
+import type { User } from "@supabase/supabase-js";
+import { ServiceUnavailable } from "@/components/service-unavailable";
 import { LanguageSelector, T } from "@/lib/i18n";
 import { GoogleOAuthButton } from "@/components/auth/google-oauth-button";
 import { getCurrentUser, getOnboardingStatus } from "@/lib/auth";
+import { isAuthServiceUnavailableError } from "@/lib/supabase/auth-errors";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function LoginPage({
@@ -11,14 +14,27 @@ export default async function LoginPage({
   searchParams: Promise<{ error?: string }>;
 }) {
   const supabase = await createClient();
-  const user = await getCurrentUser(supabase);
+  const { error } = await searchParams;
+  let user: User | null;
+
+  try {
+    user = await getCurrentUser(supabase);
+  } catch (error) {
+    if (isAuthServiceUnavailableError(error)) {
+      return <ServiceUnavailable />;
+    }
+
+    throw error;
+  }
 
   if (user) {
     const { complete } = await getOnboardingStatus(supabase, user.id);
     redirect(complete ? "/dashboard" : "/onboarding");
   }
 
-  const { error } = await searchParams;
+  if (error === "service_unavailable") {
+    return <ServiceUnavailable />;
+  }
 
   return (
     <main className="auth-page">

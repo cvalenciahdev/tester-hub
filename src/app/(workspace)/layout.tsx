@@ -1,11 +1,24 @@
 import { redirect } from "next/navigation";
+import type { User } from "@supabase/supabase-js";
 import { AppShell } from "@/components/app-shell";
+import { ServiceUnavailable } from "@/components/service-unavailable";
 import { getCurrentUser, getOnboardingStatus, getUserDisplayName, getUserInitials } from "@/lib/auth";
+import { isAuthServiceUnavailableError } from "@/lib/supabase/auth-errors";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function WorkspaceLayout({ children }: LayoutProps<"/">) {
   const supabase = await createClient();
-  const user = await getCurrentUser(supabase);
+  let user: User | null;
+
+  try {
+    user = await getCurrentUser(supabase);
+  } catch (error) {
+    if (isAuthServiceUnavailableError(error)) {
+      return <ServiceUnavailable />;
+    }
+
+    throw error;
+  }
 
   if (!user) {
     redirect("/login");

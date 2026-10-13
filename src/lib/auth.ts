@@ -1,5 +1,10 @@
 import "server-only";
+import { isAuthRetryableFetchError } from "@supabase/supabase-js";
 import { isCountryCode } from "@/lib/countries";
+import {
+  AuthServiceUnavailableError,
+  isUnauthenticatedAuthError,
+} from "@/lib/supabase/auth-errors";
 
 import type { User } from "@supabase/supabase-js";
 import type { createClient } from "@/lib/supabase/server";
@@ -18,11 +23,17 @@ export async function getCurrentUser(
 ): Promise<User | null> {
   const { data, error } = await supabase.auth.getUser();
 
-  if (error && error.name !== "AuthSessionMissingError") {
-    throw error;
+  if (error) {
+    if (isAuthRetryableFetchError(error)) {
+      throw new AuthServiceUnavailableError();
+    }
+
+    if (!isUnauthenticatedAuthError(error)) {
+      throw error;
+    }
   }
 
-  return data.user;
+  return error ? null : data.user;
 }
 
 export async function getOnboardingStatus(

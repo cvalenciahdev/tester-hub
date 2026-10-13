@@ -1,13 +1,26 @@
 import { redirect } from "next/navigation";
 import { Check, FlaskConical } from "lucide-react";
+import type { User } from "@supabase/supabase-js";
+import { ServiceUnavailable } from "@/components/service-unavailable";
 import { LanguageSelector, T } from "@/lib/i18n";
 import { getCurrentUser, getOnboardingStatus } from "@/lib/auth";
+import { isAuthServiceUnavailableError } from "@/lib/supabase/auth-errors";
 import { createClient } from "@/lib/supabase/server";
 import { OnboardingForm } from "./onboarding-form";
 
 export default async function OnboardingPage() {
   const supabase = await createClient();
-  const user = await getCurrentUser(supabase);
+  let user: User | null;
+
+  try {
+    user = await getCurrentUser(supabase);
+  } catch (error) {
+    if (isAuthServiceUnavailableError(error)) {
+      return <ServiceUnavailable />;
+    }
+
+    throw error;
+  }
 
   if (!user) {
     redirect("/login");

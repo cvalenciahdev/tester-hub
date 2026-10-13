@@ -538,6 +538,7 @@ td { height: 64px; padding: 7px 13px; border-top: 1px solid var(--line); color: 
 @media (max-width: 850px) {
   .sidebar { width: 220px; }
   .main-column { margin-left: 220px; }
+  .app-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .dashboard-grid { grid-template-columns: 1fr; }
   .activity-panel { display: none; }
   .detail-layout { grid-template-columns: minmax(0, 1fr) 260px; }
